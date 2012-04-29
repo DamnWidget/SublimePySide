@@ -1,0 +1,32 @@
+{ "name": "QML",
+  "scopeName": "source.qml",
+  "fileTypes": ["qml"],
+  "patterns": [
+    { "include": "#imports" },
+    { "name": "comment.block.documentation.qml",
+      "begin": "/\\*\\*(?!/)",
+      "captures": {
+          "0": { "name": "punctuation.definition.comment.qml" }
+      },
+      "end": "\\*/"
+    },
+    {  "name": "meta.class.qml",
+       "match": "([a-zA-Z_?.$][\\w?.$]*)\\s*(\\{)\\s*",
+       "captures": {
+          "1": { "name": "support.class.qml" }
+       }
+    },
+    { "name": "meta.import.qml",
+      "begin": "\\b(import)\\s+",
+      "beginCaptures": {
+        "1": { "name": "keyword.other.import.qml" }
+      },
+      "patterns": [
+        { "include": "source.scala" }
+      ],
+      "end": "(?<=[\\n;])"
+    },
+    { "include": "source.js" }
+  ],
+  "uuid": "13a281e0-0507-45b4-bb6c-a57177630f10"
+}
