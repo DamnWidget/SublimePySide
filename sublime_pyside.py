@@ -7,6 +7,7 @@ import sublime
 import sublime_plugin
 
 import os
+import shutil
 import threading
 from glob import glob
 
@@ -49,8 +50,17 @@ class Project(object):
         path = self.tpl.replace(' ', '_').lower()
 
         for file in glob('{0}/{1}/*'.format(get_templates_dir(), path)):
+            if os.path.isdir(file):
+                sublime.status_message('Copying {0} tree...'.format(file))
+                try:
+                    shutil.copytree(file, '{0}/{1}'.format(self.root,
+                        file.split('/')[-1]))
+                except OSError, e:
+                        sublime.error_message(e)
+                continue
             with open(file, 'r') as fh:
-                buffer = fh.read().replace('${APP_NAME}', self.name)
+                buffer = fh.read().replace('${APP_NAME}',
+                    self.name.encode('utf8'))
             with open('{0}/{1}'.format(
                 self.root, file.split('/')[-1]), 'w') as fh:
                 fh.write(buffer)
