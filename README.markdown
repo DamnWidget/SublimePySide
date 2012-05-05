@@ -31,6 +31,13 @@ Features
 * PySide Qt project creation
 * PySide autocompletion via SublimeRope
 
+Supported Templates
+--------------------
+
+* Qt Quick Application (Python + QML)
+* Qt Uick UI (Pure QML)
+* Qt Gui Application (Pure Python)
+
 License:
 --------
     This program is free software; you can redistribute it and/or modify
