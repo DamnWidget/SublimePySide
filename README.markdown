@@ -1,4 +1,4 @@
-**SublimeQt**
+**Sublime PySide**
 ================
 
 status: beta
@@ -6,7 +6,7 @@ status: beta
 Overview
 ========
 
-SublimeQt adds Qt support for Sublime Text 2.
+Sublime PySide adds Qt support for Sublime Text 2 on Python.
 
 Python support is build for PySide only. This has been tested on Linux and Mac OSX
 
@@ -16,10 +16,20 @@ Copyright (C) 2012 Oscar Campos <oscar.campos@member.fsf.org>
 Getting Started
 ---------------
 
-Bla bla bla
+Unzip / git clone the SublimePySide directory into your ST2's Packages directory. To create a new PySide Qt project just open your ST2 console and input this command:
 
-How to Use
+    window.run_command('create_qt_project')
+
+Then select the type of project you want to create and answer the questions.
+
+**IMPORTANT**: This plugin use SublimeRope if installed to generate Rope projects in an automatic way.
+
+Features
 ----------
+
+* QML file syntax highligth
+* PySide Qt project creation
+* PySide autocompletion via SublimeRope
 
 License:
 --------
