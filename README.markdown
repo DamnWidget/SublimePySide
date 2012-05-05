@@ -16,11 +16,15 @@ Copyright (C) 2012 Oscar Campos <oscar.campos@member.fsf.org>
 Getting Started
 ---------------
 
-Unzip / git clone the SublimePySide directory into your ST2's Packages directory. To create a new PySide Qt project just open your ST2 console and input this command:
+Unzip / git clone the SublimePySide directory into your ST2's Packages directory. To create a new PySide Qt project just use your Operating System keybindings:
 
-    window.run_command('create_qt_project')
+    ctrl+shift+q on Linux
+    ctrl+super+q on Mac OSX
+    ctrl+alt+q on Windows
 
 Then select the type of project you want to create and answer the questions.
+
+You can also use the Tools menu at the toolbar.
 
 **IMPORTANT**: This plugin use SublimeRope if installed to generate Rope projects in an automatic way.
 
@@ -28,6 +32,7 @@ Features
 ----------
 
 * QML file syntax highligth
+* QMLProject file syntax highlight
 * PySide Qt project creation
 * PySide autocompletion via SublimeRope
 
@@ -37,6 +42,7 @@ Supported Templates
 * Qt Quick Application (Python + QML)
 * Qt Uick UI (Pure QML)
 * Qt Gui Application (Pure Python)
+* Qt Console Application (Pure Python)
 
 License:
 --------

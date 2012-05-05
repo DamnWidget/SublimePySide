@@ -1,0 +1,6 @@
+[
+    {
+        "caption": "SublimePySide: Create new Qt Project from template",
+        "command": "create_qt_project"
+    }
+]

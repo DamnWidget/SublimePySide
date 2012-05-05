@@ -1,0 +1,36 @@
+/*
+    SublimePySide default settings
+*/
+{
+    /*
+        Sets the path to PySide Tools
+    */
+    "sublimepyside_tools_map":
+    {
+        "uic": "/usr/bin/pyside-uic",
+        "lupdate": "/usr/bin/pyside-lupdate",
+        "rcc": "/usr/bin/pyside-rcc"
+    },
+
+    /*
+        Sets the path to Qt Tools
+    */
+    "sublimepyside_qt_tools_map":
+    {
+        "linguist": "/usr/bin/linguist",
+        "designer": "/usr/bin/designer",
+        "qdbusviewer": "/usr/bin/qdbusviewer"
+    },
+
+    /*
+        Sets the package name (do not edit)
+    */
+    "sublimepyside_package": "SublimePySide",
+
+    /*
+        Sets the data directory (do not edit)
+    */
+    "sublimepyside_data_dir": "data"
+
+
+}

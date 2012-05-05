@@ -1,0 +1,5 @@
+{
+    "version": "0.0.2",
+    "url": "http://https://github.com/DamnWidget/SublimePySide",
+    "description": "Adds support for Nokia's Qt Python Bindings and QML language in Sublime Text 2"
+}

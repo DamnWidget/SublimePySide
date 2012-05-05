@@ -17,8 +17,6 @@ try:
 except ImportError:
     rope_support = False
 
-from settings import cfg
-
 
 class Project(object):
     """
@@ -133,15 +131,15 @@ class CreateQtProjectThread(threading.Thread):
 
         self.proj_name = name
 
-        # if rope_support:
-        #     try:
-        #         rope_project = rope.base.project.Project(
-        #             projectroot=self.proj_dir)
-        #         rope_project.close()
-        #     except Exception, e:
-        #         msg = 'Could not create rope project folder at {0}\n' \
-        #               'Exception: {1}'.format(self.proj_dir, str(e))
-        #         sublime.error_message(msg)
+        if rope_support:
+            try:
+                rope_project = rope.base.project.Project(
+                    projectroot=self.proj_dir)
+                rope_project.close()
+            except Exception, e:
+                msg = 'Could not create rope project folder at {0}\n' \
+                      'Exception: {1}'.format(self.proj_dir, str(e))
+                sublime.error_message(msg)
 
         project = Project(self.proj_dir, self.proj_name, self.proj_tpl)
         if project.is_valid():
@@ -172,6 +170,23 @@ def get_templates_dir():
 
     return '{0}/{1}/{2}/templates'.format(
         sublime.packages_path(),
-        cfg.get('package'),
-        cfg.get('data_dir')
+        get_settings('sublimepyside_package'),
+        get_settings('sublimepyside_data_dir')
     )
+
+
+def get_settings(name, typeof=str):
+    settings = sublime.load_settings('SublimePySide.sublime-settings')
+    setting = settings.get(name)
+    if setting:
+        if typeof == str:
+            return setting
+        elif typeof == bool:
+            return setting == True
+        elif typeof == int:
+            return int(settings.get(name, 500))
+    else:
+        if typeof == str:
+            return ''
+        else:
+            return None

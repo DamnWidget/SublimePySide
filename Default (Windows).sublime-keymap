@@ -1,0 +1,3 @@
+[
+    { "keys": ["ctrl+alt+q"], "command": "create_qt_project" }
+]
