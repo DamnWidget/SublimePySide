@@ -24,7 +24,7 @@ Unzip / git clone the SublimePySide directory into your ST2's Packages directory
 
 Then select the type of project you want to create and answer the questions.
 
-You can also use the Tools menu at the toolbar.
+You can also use the Tools menu at the toolbar to create a new project.
 
 **IMPORTANT**: This plugin use SublimeRope if installed to generate Rope projects in an automatic way.
 
