@@ -43,6 +43,7 @@ Supported Templates
 * Qt Uick UI (Pure QML)
 * Qt Gui Application (Pure Python)
 * Qt Console Application (Pure Python)
+* Qt Unit Test (dumb skeleton)
 
 License:
 --------
