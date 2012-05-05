@@ -5,6 +5,7 @@
 	<key>fileTypes</key>
 	<array>
 		<string>qml</string>
+		<string>qmlproject</string>
 	</array>
 	<key>name</key>
 	<string>QML</string>

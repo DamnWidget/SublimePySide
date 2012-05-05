@@ -1,6 +1,6 @@
 { "name": "QML",
   "scopeName": "source.qml",
-  "fileTypes": ["qml"],
+  "fileTypes": ["qml", "qmlproject"],
   "patterns": [
     { "include": "#imports" },
     { "name": "comment.block.documentation.qml",

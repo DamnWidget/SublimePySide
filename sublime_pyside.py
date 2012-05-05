@@ -47,7 +47,7 @@ class Project(object):
         """
 
         path = self.tpl.replace(' ', '_').lower()
-        # TODO: extract this to a recursive function that recurse into folders
+
         for file in glob('{0}/{1}/*'.format(get_templates_dir(), path)):
             with open(file, 'r') as fh:
                 buffer = fh.read().replace('${APP_NAME}', self.name)
