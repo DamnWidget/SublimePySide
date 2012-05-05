@@ -3,7 +3,4 @@ Qt Quick UI: Creates a Qt Quick UI project with a single QML file that contains 
 Qt Gui Application: Creates a Qt application for the desktop. Includes a Qt Designer-based main window
 Qt Console Application: Creates a project containing a single main.py file with a stub implementation
 Qt Unit Test: Creates a QTestLib-based unit test for a feature or a class. Unit tests allow you to verify that the code is fit for use and that there are no regressions
-Qt Custom Designer widget: Creates a Qt Custom Designer Widget or a Custom Widget Collection
-Mobile Qt Application: Creates a Qt application optimized for mobile devices with a Qt Designer-based main window
-HTML5 Application: Creates an HTML5 application project that can contain both HTML5 and Python code and includes a WebKit view.
 Git Repository Clone: Clones a Git repository and tries to load the contained project
