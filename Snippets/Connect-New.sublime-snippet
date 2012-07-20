@@ -1,0 +1,6 @@
+<snipet>
+    <content><![CDATA[${1:component}.${2:signal}(${3:func})]]></content>
+    <tabTrigger>connect</tabTrigger>
+    <scope>source.python</scope>
+    <description>Signal/Slot >> New Syntax</description>
+</snipet>

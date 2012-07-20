@@ -1,0 +1,6 @@
+<snipet>
+    <content><![CDATA[QtCore.QObject.connect(${1:component}, QtCore.SIGNAL('${2:signal}()'), ${3:func})]]></content>
+    <tabTrigger>connect</tabTrigger>
+    <scope>source.python</scope>
+    <description>Signal/Slot >> Odl Syntax</description>
+</snipet>

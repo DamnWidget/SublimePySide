@@ -1,0 +1,6 @@
+<snipet>
+    <content><![CDATA[@QtCore.Slot(${1:type})]]></content>
+    <tabTrigger>slot</tabTrigger>
+    <scope>source.python</scope>
+    <description>@QtCore.Slot</description>
+</snipet>

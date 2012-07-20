@@ -1,0 +1,6 @@
+<snipet>
+    <content><![CDATA[QtCore.Signal(${1})]]></content>
+    <tabTrigger>signal</tabTrigger>
+    <scope>source.python</scope>
+    <description>QtCore.Signal(...)</description>
+</snipet>
