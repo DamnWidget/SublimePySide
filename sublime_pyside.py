@@ -8,7 +8,9 @@ import sublime_plugin
 
 import os
 import shutil
+import functools
 import threading
+import collections
 from glob import glob
 
 try:
@@ -29,6 +31,8 @@ class Project(object):
         self.root = projectroot
         self.name = projectname
         self.tpl = projecttpl
+        # cache settings to avoid problems with threads in Mac OS X
+        get_templates_dir()
 
     def is_valid(self):
         """
@@ -80,6 +84,10 @@ class CreateQtProjectThread(threading.Thread):
     def __init__(self, window):
         self.window = window
         threading.Thread.__init__(self)
+        self.settings = {
+            'sublimepyside_package': get_settings('sublimepyside_package'),
+            'sublimepyside_data_dir': get_settings('sublimepyside_data_dir')
+        }
 
     def run(self):
         """
@@ -151,6 +159,30 @@ class CreateQtProjectThread(threading.Thread):
             )
 
 
+def cache(function):
+    """
+    Decorator to cache data in function calls
+    """
+    cache = {}
+
+    @functools.wraps(function)
+    def wrapper(*args, **kwargs):
+        key = args
+        if kwargs:
+            key += tuple(sorted(kwargs.items()))
+        try:
+            result = cache[key]
+            wrapper.hits += 1
+        except KeyError:
+            result = function(*args, **kwargs)
+            cache[key] = result
+            wrapper.misses += 1
+
+        return result
+    wrapper.hits = wrapper.misses = 0
+    return wrapper
+
+
 def get_template_list():
     """
     Generator for lazy templates list
@@ -175,6 +207,7 @@ def get_templates_dir():
     )
 
 
+@cache
 def get_settings(name, typeof=str):
     settings = sublime.load_settings('SublimePySide.sublime-settings')
     setting = settings.get(name)
