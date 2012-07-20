@@ -7,10 +7,11 @@ import sublime
 import sublime_plugin
 
 import os
+import sys
 import shutil
 import functools
 import threading
-import collections
+import subprocess
 from glob import glob
 
 try:
@@ -25,21 +26,20 @@ class Project(object):
     Project class for PySide Qt Projects
     """
 
-    def __init__(self, projectroot, projectname, projecttpl):
+    def __init__(self, projectroot, projectname, projecttpl, templates):
         super(Project, self).__init__()
 
+        self.templates = templates
         self.root = projectroot
         self.name = projectname
         self.tpl = projecttpl
-        # cache settings to avoid problems with threads in Mac OS X
-        get_templates_dir()
 
     def is_valid(self):
         """
         Checks if the project is valid
         """
 
-        if self.tpl not in [tpl.split('::')[0] for tpl in get_template_list()]:
+        if self.tpl not in [tpl.split('::')[0] for tpl in self.templates]:
             return False
 
         return True
@@ -83,25 +83,22 @@ class CreateQtProjectThread(threading.Thread):
     """
     def __init__(self, window):
         self.window = window
+        self.folders = self.window.folders()
+        self.templates = list(get_template_list())
         threading.Thread.__init__(self)
-        self.settings = {
-            'sublimepyside_package': get_settings('sublimepyside_package'),
-            'sublimepyside_data_dir': get_settings('sublimepyside_data_dir')
-        }
 
     def run(self):
         """
         Starts the thread
         """
-        self.template_list = list(get_template_list())
 
         def show_quick_pane():
-            if not self.template_list:
+            if not self.templates:
                 sublime.error_message(
                     "{0}: There are no templates to list.".format(__name__))
                 return
 
-            self.window.show_quick_panel(self.template_list, self.done)
+            self.window.show_quick_panel(self.templates, self.done)
 
         sublime.set_timeout(show_quick_pane, 10)
 
@@ -112,11 +109,10 @@ class CreateQtProjectThread(threading.Thread):
         if picked == -1:
             return
 
-        self.proj_tpl = self.template_list[picked].split('::')[0]
+        self.proj_tpl = self.templates[picked].split('::')[0]
 
-        folders = self.window.folders()
-        suggestion = folders[0] if folders else os.path.expanduser('~')
-        self.window.show_input_panel('Project root:', suggestion,
+        suggest = self.folders[0] if self.folders else os.path.expanduser('~')
+        self.window.show_input_panel('Project root:', suggest,
             self.entered_proj_dir, None, None
         )
 
@@ -149,7 +145,9 @@ class CreateQtProjectThread(threading.Thread):
                       'Exception: {1}'.format(self.proj_dir, str(e))
                 sublime.error_message(msg)
 
-        project = Project(self.proj_dir, self.proj_name, self.proj_tpl)
+        project = Project(
+                self.proj_dir, self.proj_name, self.proj_tpl, self.templates)
+
         if project.is_valid():
             project.create_files()
         else:
@@ -158,29 +156,29 @@ class CreateQtProjectThread(threading.Thread):
                     self.proj_tpl)
             )
 
+        if sublime.ok_cancel_dialog('Do you want to add the project '
+                            'directory to the Sublime Text 2 current Window?'):
+            subprocess.Popen([sublime_executable_path(), '-a', self.proj_dir])
 
-def cache(function):
+
+def sublime_executable_path():
     """
-    Decorator to cache data in function calls
+    Return the Sublime Text 2 installation path for each platform
     """
-    cache = {}
+    platform = sublime.platform()
+    e = sublime.set_timeout(functools.partial(get_settings, 'osx_st2_path'), 0)
+    if platform == 'osx':
+        if not e:
+            return '/Applications/Sublime Text 2.app' \
+                                            '/Contents/SharedSupport/bin/subl'
+        else:
+            return e
 
-    @functools.wraps(function)
-    def wrapper(*args, **kwargs):
-        key = args
-        if kwargs:
-            key += tuple(sorted(kwargs.items()))
-        try:
-            result = cache[key]
-            wrapper.hits += 1
-        except KeyError:
-            result = function(*args, **kwargs)
-            cache[key] = result
-            wrapper.misses += 1
+    if platform == 'linux':
+        if os.path.exists('/proc/self/cmdline'):
+            return open('/proc/self/cmdline').read().split(chr(0))[0]
 
-        return result
-    wrapper.hits = wrapper.misses = 0
-    return wrapper
+    return sys.executable
 
 
 def get_template_list():
@@ -207,7 +205,6 @@ def get_templates_dir():
     )
 
 
-@cache
 def get_settings(name, typeof=str):
     settings = sublime.load_settings('SublimePySide.sublime-settings')
     setting = settings.get(name)
