@@ -56,7 +56,7 @@ class Project(object):
                 sublime.status_message('Copying {0} tree...'.format(file))
                 try:
                     shutil.copytree(file, '{0}/{1}'.format(self.root,
-                        file.split('/')[-1]))
+                        os.path.basename(file)))
                 except OSError, e:
                         sublime.error_message(e)
                 continue
@@ -64,7 +64,7 @@ class Project(object):
                 buffer = fh.read().replace('${APP_NAME}',
                     self.name.encode('utf8'))
             with open('{0}/{1}'.format(
-                self.root, file.split('/')[-1]), 'w') as fh:
+                self.root, os.path.basename(file)), 'w') as fh:
                 fh.write(buffer)
                 sublime.status_message('Copying {0} file...'.format(file))
 
