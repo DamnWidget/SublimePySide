@@ -33,13 +33,13 @@
                         [
                             {
                                 "command": "open_file",
-                                "args": {"file": "${packages}/SublimePySide/README.markdown"},
+                                "args": {"file": "${packages}/PySide/README.markdown"},
                                 "caption": "README"
                             },
                             { "caption": "-" },
                             {
                                 "command": "open_file",
-                                "args": {"file": "${packages}/SublimePySide/SublimePySide.sublime-settings"},
+                                "args": {"file": "${packages}/PySide/SublimePySide.sublime-settings"},
                                 "caption": "Settings - Default"
                             },
                             {
@@ -55,7 +55,7 @@
                             {
                                 "command": "open_file",
                                 "args": {
-                                    "file": "${packages}/SublimePySide/Default (OSX).sublime-keymap",
+                                    "file": "${packages}/PySide/Default (OSX).sublime-keymap",
                                     "platform": "OSX"
                                 },
                                 "caption": "Key Bindings – Default"
@@ -63,7 +63,7 @@
                             {
                                 "command": "open_file",
                                 "args": {
-                                    "file": "${packages}/SublimePySide/Default (Linux).sublime-keymap",
+                                    "file": "${packages}/PySide/Default (Linux).sublime-keymap",
                                     "platform": "Linux"
                                 },
                                 "caption": "Key Bindings – Default"
@@ -71,7 +71,7 @@
                             {
                                 "command": "open_file",
                                 "args": {
-                                    "file": "${packages}/SublimePySide/Default (Windows).sublime-keymap",
+                                    "file": "${packages}/PySide/Default (Windows).sublime-keymap",
                                     "platform": "Windows"
                                 },
                                 "caption": "Key Bindings – Default"
