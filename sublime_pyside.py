@@ -68,6 +68,27 @@ class Project(object):
                 fh.write(buffer)
                 sublime.status_message('Copying {0} file...'.format(file))
 
+    def create_rope_files(self):
+        """
+        Create the Rope project files
+        """
+
+        try:
+            rope_project = rope.base.project.Project(
+                projectroot=self.root)
+            rope_project.close()
+        except Exception, e:
+            msg = 'Could not create rope project folder at {0}\n' \
+                  'Exception: {1}'.format(self.root, str(e))
+            sublime.error_message(msg)
+
+    def create_st2_project_files(self):
+        """
+        Create the Sublime Text 2 project file
+        """
+
+        pass
+
 
 class CreateQtProjectCommand(sublime_plugin.WindowCommand):
     """
@@ -117,8 +138,15 @@ class CreateQtProjectThread(threading.Thread):
         )
 
     def entered_proj_dir(self, path):
+        if not os.path.exists(path):
+            if sublime.ok_cancel_dialog('{path} does not exists.'
+                            'Do you want to create it now?'.format(path=path)):
+                os.makedirs(path)
+            else:
+                return
+
         if not os.path.isdir(path):
-            sublime.error_message("Is not a directory: {0}".format(path))
+            sublime.error_message("{path} is not a directory".format(path=path))
             return
 
         self.proj_dir = path
@@ -135,21 +163,19 @@ class CreateQtProjectThread(threading.Thread):
 
         self.proj_name = name
 
-        if rope_support:
-            try:
-                rope_project = rope.base.project.Project(
-                    projectroot=self.proj_dir)
-                rope_project.close()
-            except Exception, e:
-                msg = 'Could not create rope project folder at {0}\n' \
-                      'Exception: {1}'.format(self.proj_dir, str(e))
-                sublime.error_message(msg)
-
         project = Project(
                 self.proj_dir, self.proj_name, self.proj_tpl, self.templates)
 
         if project.is_valid():
             project.create_files()
+            if rope_support:
+                project.create_rope_files()
+            project.create_st2_project_files()
+            if sublime.ok_cancel_dialog('Do you want to add the project '
+                            'directory to the current Sublime Text 2 Window?'):
+                subprocess.Popen(
+                    [sublime_executable_path(), '-a', self.proj_dir]
+                )
         else:
             sublime.error_message(
                 'Could not create Qt Project files for template "{0}"'.format(
