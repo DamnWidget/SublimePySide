@@ -1,0 +1,16 @@
+{
+    "folders":
+    [
+        {
+            "path": "${PATH}"
+        }
+    ],
+    "settings":
+    {
+        "rope_autoimport_modules":
+        [
+            "${QT_LIBRARY}.*"
+        ]
+    }
+}
+

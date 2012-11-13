@@ -1,7 +1,12 @@
+"""
+Sublime PySide adds support for Nokia's PySide and Riberbancks PyQt libraries
+"""
+
 # -*- coding: utf8 -*-
 
 # Copyright (C) 2012 - Oscar Campos <oscar.campos@member.fsf.org>
 # This plugin is Free Software see LICENSE file for details
+
 
 import sublime
 import sublime_plugin
@@ -16,9 +21,10 @@ from glob import glob
 
 try:
     import rope
-    rope_support = True
+    from rope.base.exceptions import RopeError, ResourceNotFoundError
+    ROPE_SUPPORT = True
 except ImportError:
-    rope_support = False
+    ROPE_SUPPORT = False
 
 
 class Project(object):
@@ -51,22 +57,22 @@ class Project(object):
 
         path = self.tpl.replace(' ', '_').lower()
 
-        for file in glob('{0}/{1}/*'.format(get_templates_dir(), path)):
-            if os.path.isdir(file):
-                sublime.status_message('Copying {0} tree...'.format(file))
+        for tpl_file in glob('{0}/{1}/*'.format(get_templates_dir(), path)):
+            if os.path.isdir(tpl_file):
+                sublime.status_message('Copying {0} tree...'.format(tpl_file))
                 try:
-                    shutil.copytree(file, '{0}/{1}'.format(self.root,
-                        os.path.basename(file)))
-                except OSError, e:
-                        sublime.error_message(e)
+                    shutil.copytree(tpl_file, '{0}/{1}'.format(self.root,
+                        os.path.basename(tpl_file)))
+                except OSError, error:
+                    sublime.error_message(error)
                 continue
-            with open(file, 'r') as fh:
-                buffer = fh.read().replace('${APP_NAME}',
+            with open(tpl_file, 'r') as file_handler:
+                file_buffer = file_handler.read().replace('${APP_NAME}',
                     self.name.encode('utf8'))
             with open('{0}/{1}'.format(
-                self.root, os.path.basename(file)), 'w') as fh:
-                fh.write(buffer)
-                sublime.status_message('Copying {0} file...'.format(file))
+                self.root, os.path.basename(tpl_file)), 'w') as file_handler:
+                file_handler.write(file_buffer)
+                sublime.status_message('Copying {0} file...'.format(tpl_file))
 
     def create_rope_files(self):
         """
@@ -77,9 +83,9 @@ class Project(object):
             rope_project = rope.base.project.Project(
                 projectroot=self.root)
             rope_project.close()
-        except Exception, e:
+        except (ResourceNotFoundError, RopeError), error:
             msg = 'Could not create rope project folder at {0}\n' \
-                  'Exception: {1}'.format(self.root, str(e))
+                  'Exception: {1}'.format(self.root, str(error))
             sublime.error_message(msg)
 
     def create_st2_project_files(self):
@@ -87,14 +93,22 @@ class Project(object):
         Create the Sublime Text 2 project file
         """
 
-        pass
+        with open(
+            '%s/%s.sublime-project' % (self.root, self.name), 'w') as fdesc:
+            with open('%s/template.sublime-project' %
+                (get_templates_dir()), 'r') as fhandler:
+                file_buffer = fhandler.read().replace(
+                    '${PATH}', self.root).replace('${QT_LIBRARY}', 'PySide')
+            fdesc.write(file_buffer)
 
 
 class CreateQtProjectCommand(sublime_plugin.WindowCommand):
     """
     Creates a new PySide application from a template
     """
+
     def run(self):
+        """WindowCommand entry point"""
         CreateQtProjectThread(self.window).start()
 
 
@@ -106,6 +120,10 @@ class CreateQtProjectThread(threading.Thread):
         self.window = window
         self.folders = self.window.folders()
         self.templates = list(get_template_list())
+        self.proj_tpl = None
+        self.proj_dir = None
+        self.proj_name = None
+
         threading.Thread.__init__(self)
 
     def run(self):
@@ -114,6 +132,7 @@ class CreateQtProjectThread(threading.Thread):
         """
 
         def show_quick_pane():
+            """Just a wrapper to get set_timeout on OSX and Windows"""
             if not self.templates:
                 sublime.error_message(
                     "{0}: There are no templates to list.".format(__name__))
@@ -138,15 +157,17 @@ class CreateQtProjectThread(threading.Thread):
         )
 
     def entered_proj_dir(self, path):
+        """Called when user select an option in the quick panel"""
         if not os.path.exists(path):
-            if sublime.ok_cancel_dialog('{path} does not exists.'
+            if sublime.ok_cancel_dialog('{path} does not exists.\n'
                             'Do you want to create it now?'.format(path=path)):
                 os.makedirs(path)
             else:
                 return
 
         if not os.path.isdir(path):
-            sublime.error_message("{path} is not a directory".format(path=path))
+            sublime.error_message(
+                "{path} is not a directory".format(path=path))
             return
 
         self.proj_dir = path
@@ -157,6 +178,7 @@ class CreateQtProjectThread(threading.Thread):
         )
 
     def entered_proj_name(self, name):
+        """Called when the user enter the project name"""
         if not name:
             sublime.error_message("You will use a project name")
             return
@@ -168,23 +190,27 @@ class CreateQtProjectThread(threading.Thread):
 
         if project.is_valid():
             project.create_files()
-            if rope_support:
+            if ROPE_SUPPORT:
                 project.create_rope_files()
             project.create_st2_project_files()
-            if sublime.ok_cancel_dialog('Do you want to add the project '
-                            'directory to the current Sublime Text 2 Window?'):
-                subprocess.Popen(
-                    [sublime_executable_path(), '-a', self.proj_dir]
-                )
+
+            subprocess.Popen(
+                [
+                    sublime_executable_path(),
+                    '--project',
+                    '%s/%s.sublime-project' % (self.proj_dir, self.proj_name)
+                ]
+            )
+
+            if ROPE_SUPPORT:
+                if sublime.ok_cancel_dialog('Do you want to regenerate the '
+                    'PySide/PyQt module cache now? (really recommended)'):
+                    self.window.run_command('python_generate_modules_cache')
         else:
             sublime.error_message(
                 'Could not create Qt Project files for template "{0}"'.format(
                     self.proj_tpl)
             )
-
-        if sublime.ok_cancel_dialog('Do you want to add the project '
-                            'directory to the Sublime Text 2 current Window?'):
-            subprocess.Popen([sublime_executable_path(), '-a', self.proj_dir])
 
 
 def sublime_executable_path():
@@ -192,13 +218,14 @@ def sublime_executable_path():
     Return the Sublime Text 2 installation path for each platform
     """
     platform = sublime.platform()
-    e = sublime.set_timeout(functools.partial(get_settings, 'osx_st2_path'), 0)
+    error = sublime.set_timeout(
+        functools.partial(get_settings, 'osx_st2_path'), 0)
     if platform == 'osx':
-        if not e:
+        if not error:
             return '/Applications/Sublime Text 2.app' \
                                             '/Contents/SharedSupport/bin/subl'
         else:
-            return e
+            return error
 
     if platform == 'linux':
         if os.path.exists('/proc/self/cmdline'):
@@ -212,8 +239,8 @@ def get_template_list():
     Generator for lazy templates list
     """
 
-    with open("{0}/templates.lst".format(get_templates_dir(), "r")) as fh:
-        for tpl in fh.read().split('\n'):
+    with open("{0}/templates.lst".format(get_templates_dir(), "r")) as fhandle:
+        for tpl in fhandle.read().split('\n'):
             if len(tpl):
                 tpl_split = tpl.split(':')
                 yield "{0}:: {1}".format(tpl_split[0], tpl_split[1])
@@ -232,6 +259,7 @@ def get_templates_dir():
 
 
 def get_settings(name, typeof=str):
+    """Get settings"""
     settings = sublime.load_settings('SublimePySide.sublime-settings')
     setting = settings.get(name)
     if setting:
