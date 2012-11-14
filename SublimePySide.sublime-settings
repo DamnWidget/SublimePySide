@@ -30,7 +30,12 @@
     /*
         Sets the data directory (do not edit)
     */
-    "sublimepyside_data_dir": "data"
+    "sublimepyside_data_dir": "data",
+
+    /*
+        Sets the Qt Library to use (change in your ST2 Project Settings)
+    */
+    "sublimepyside_library": "PySide"
 
 
 }
