@@ -33,9 +33,13 @@
     "sublimepyside_data_dir": "data",
 
     /*
-        Sets the Qt Library to use (change in your ST2 Project Settings)
+        Sets the Qt Library to use
     */
-    "sublimepyside_library": "PySide"
+    "sublimepyside_library": "PySide",
 
-
+    /*
+        If is set to true, SublimePySide should ask about which libraary to use
+        PySide or PyQt4
+    */
+    "sublimepyside_library_ask": true
 }

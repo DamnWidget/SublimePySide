@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-from PySide import QtCore, QtGui
+from ${QT_LIBRARY} import QtCore, QtGui
 
 import application_rc
 
@@ -60,60 +60,67 @@ class MainWindow(QtGui.QMainWindow):
         return False
 
     def about(self):
-        QtGui.QMessageBox.about(self, "About ${APP_NAME}",
-                "The <b>${APP_NAME}</b> example demonstrates how to write "
-                "modern GUI applications using Qt, with a menu bar, "
-                "toolbars, and a status bar.")
+        QtGui.QMessageBox.about(
+            self,
+            "About ${APP_NAME}",
+            "The <b>${APP_NAME}</b> example demonstrates how to write "
+            "modern GUI applications using Qt, with a menu bar, "
+            "toolbars, and a status bar.")
 
     def documentWasModified(self):
         self.setWindowModified(self.textEdit.document().isModified())
 
     def createActions(self):
         self.newAct = QtGui.QAction(QtGui.QIcon(':/images/new.png'), "&New",
-                self, shortcut=QtGui.QKeySequence.New,
-                statusTip="Create a new file", triggered=self.newFile)
+                                    self, shortcut=QtGui.QKeySequence.New,
+                                    statusTip="Create a new file",
+                                    triggered=self.newFile)
 
-        self.openAct = QtGui.QAction(QtGui.QIcon(':/images/open.png'),
-                "&Open...", self, shortcut=QtGui.QKeySequence.Open,
-                statusTip="Open an existing file", triggered=self.open)
+        self.openAct = QtGui.QAction(
+            QtGui.QIcon(':/images/open.png'), '&Open...', self,
+            shortcut=QtGui.QKeySequence.Open,
+            statusTip="Open an existing file", triggered=self.open)
 
-        self.saveAct = QtGui.QAction(QtGui.QIcon(':/images/save.png'),
-                "&Save", self, shortcut=QtGui.QKeySequence.Save,
-                statusTip="Save the document to disk", triggered=self.save)
+        self.saveAct = QtGui.QAction(
+            QtGui.QIcon(':/images/save.png'), '&Save', self,
+            shortcut=QtGui.QKeySequence.Save,
+            statusTip="Save the document to disk", triggered=self.save)
 
-        self.saveAsAct = QtGui.QAction("Save &As...", self,
-                shortcut=QtGui.QKeySequence.SaveAs,
-                statusTip="Save the document under a new name",
-                triggered=self.saveAs)
+        self.saveAsAct = QtGui.QAction(
+            'Save &As...', self, shortcut=QtGui.QKeySequence.SaveAs,
+            statusTip="Save the document under a new name",
+            triggered=self.saveAs)
 
-        self.exitAct = QtGui.QAction("E&xit", self, shortcut="Ctrl+Q",
-                statusTip="Exit the application", triggered=self.close)
+        self.exitAct = QtGui.QAction(
+            'E&xit', self, shortcut="Ctrl+Q", statusTip="Exit the application",
+            triggered=self.close)
 
-        self.cutAct = QtGui.QAction(QtGui.QIcon(':/images/cut.png'), "Cu&t",
-                self, shortcut=QtGui.QKeySequence.Cut,
-                statusTip="Cut the current selection's contents to the " \
-                    "clipboard",
-                triggered=self.textEdit.cut)
+        self.cutAct = QtGui.QAction(
+            QtGui.QIcon(':/images/cut.png'), 'Cu&t', self,
+            shortcut=QtGui.QKeySequence.Cut,
+            statusTip="Cut the current selection's contents to the clipboard",
+            triggered=self.textEdit.cut)
 
-        self.copyAct = QtGui.QAction(QtGui.QIcon(':/images/copy.png'),
-                "&Copy", self, shortcut=QtGui.QKeySequence.Copy,
-                statusTip="Copy the current selection's contents to the " \
-                    "clipboard",
-                triggered=self.textEdit.copy)
+        self.copyAct = QtGui.QAction(
+            QtGui.QIcon(':/images/copy.png'), '&Copy', self,
+            shortcut=QtGui.QKeySequence.Copy,
+            statusTip="Copy the current selection's contents to the clipboard",
+            triggered=self.textEdit.copy)
 
-        self.pasteAct = QtGui.QAction(QtGui.QIcon(':/images/paste.png'),
-                "&Paste", self, shortcut=QtGui.QKeySequence.Paste,
-                statusTip="Paste the clipboard's contents into the current " \
-                    "selection",
-                triggered=self.textEdit.paste)
+        self.pasteAct = QtGui.QAction(
+            QtGui.QIcon(':/images/paste.png'), '&Paste', self,
+            shortcut=QtGui.QKeySequence.Paste,
+            statusTip="Paste the clipboard's contents into "
+                      "the current selection",
+            triggered=self.textEdit.paste)
 
-        self.aboutAct = QtGui.QAction("&About", self,
-                statusTip="Show the application's About box",
-                triggered=self.about)
+        self.aboutAct = QtGui.QAction(
+            '&About', self, statusTip="Show the application's About box",
+            triggered=self.about)
 
-        self.aboutQtAct = QtGui.QAction("About &Qt", self,
-                statusTip="Show the Qt library's About box",
-                triggered=QtGui.qApp.aboutQt)
+        self.aboutQtAct = QtGui.QAction(
+            'About &Qt', self, statusTip="Show the Qt library's About box",
+            triggered=QtGui.qApp.aboutQt)
 
         self.cutAct.setEnabled(False)
         self.copyAct.setEnabled(False)
@@ -158,21 +165,26 @@ class MainWindow(QtGui.QMainWindow):
         settings = QtCore.QSettings("Trolltech", "${APP_NAME}")
         pos = settings.value("pos", QtCore.QPoint(200, 200))
         size = settings.value("size", QtCore.QSize(400, 400))
-        self.resize(size)
-        self.move(pos)
+        try:
+            self.resize(size.toSize())
+            self.move(pos.toPoint())
+        except AttributeError:
+            self.resize(size)
+            self.move(pos)
 
     def writeSettings(self):
-        settings = QtCore.QSettings("Trolltech", "{APP_NAME}")
+        settings = QtCore.QSettings("Trolltech", "${APP_NAME}")
         settings.setValue("pos", self.pos())
         settings.setValue("size", self.size())
 
     def maybeSave(self):
         if self.textEdit.document().isModified():
-            ret = QtGui.QMessageBox.warning(self, "${APP_NAME}",
-                    "The document has been modified.\nDo you want to save "
-                    "your changes?",
-                    QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard |
-                    QtGui.QMessageBox.Cancel)
+            ret = QtGui.QMessageBox.warning(
+                self, "${APP_NAME}",
+                "The document has been modified.\nDo you want to save "
+                "your changes?",
+                QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard |
+                QtGui.QMessageBox.Cancel)
             if ret == QtGui.QMessageBox.Save:
                 return self.save()
             elif ret == QtGui.QMessageBox.Cancel:
@@ -182,9 +194,9 @@ class MainWindow(QtGui.QMainWindow):
     def loadFile(self, fileName):
         file = QtCore.QFile(fileName)
         if not file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text):
-            QtGui.QMessageBox.warning(self, "{APP_NAME}",
-                    "Cannot read file %s:\n%s." % (
-                        fileName, file.errorString()))
+            QtGui.QMessageBox.warning(
+                self, "${APP_NAME}", "Cannot read file %s:\n%s." % (
+                    fileName, file.errorString()))
             return
 
         inf = QtCore.QTextStream(file)
@@ -198,9 +210,9 @@ class MainWindow(QtGui.QMainWindow):
     def saveFile(self, fileName):
         file = QtCore.QFile(fileName)
         if not file.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
-            QtGui.QMessageBox.warning(self, "${APP_NAME}",
-                    "Cannot write file %s:\n%s." % (
-                        fileName, file.errorString()))
+            QtGui.QMessageBox.warning(
+                self, "${APP_NAME}", "Cannot write file %s:\n%s." % (
+                    fileName, file.errorString()))
             return False
 
         outf = QtCore.QTextStream(file)

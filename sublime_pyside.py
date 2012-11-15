@@ -65,6 +65,7 @@ class CreateQtProjectThread(threading.Thread):
         self.proj_dir = None
         self.proj_name = None
         self.proj_library = get_settings('sublimepyside_library')
+        self.library_options = ['Use Nokia\'s PySide', 'Use RiverBank PyQt4']
 
         threading.Thread.__init__(self)
 
@@ -128,6 +129,21 @@ class CreateQtProjectThread(threading.Thread):
             return
 
         self.proj_name = name
+
+        print 'Setting ' + str(get_settings('sublimepyside_library_asl', bool))
+        if not get_settings('sublimepyside_library_ask', bool):
+            self.generate_project()
+        else:
+            self.window.show_quick_panel(
+                self.library_options, self.library_selected)
+
+    def library_selected(self, picked):
+        """Sets the selected library or PySide if none"""
+        if picked == -1:
+            self.proj_library = 'PySide'
+            return
+
+        self.proj_library = 'PyQt4' if picked == 1 else 'PySide'
         self.generate_project()
 
     def generate_project(self):
@@ -143,9 +159,11 @@ class CreateQtProjectThread(threading.Thread):
 
         if self.tplmanager.is_valid(self.tplmanager.get_selected()):
             project.generate_project()
+
+            project.generate_st2_project()
+
             if ROPE_SUPPORT:
                 project.generate_rope_project()
-            project.generate_st2_project()
 
             subprocess.Popen(
                 [

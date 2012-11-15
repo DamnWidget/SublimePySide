@@ -8,7 +8,7 @@ Overview
 
 Sublime PySide adds Qt support for Sublime Text 2 on Python.
 
-Python support is build for PySide only. This has been tested on Linux and Mac OSX
+Python support is build for PySide and PyQt4 as well. This has been tested on Linux and Mac OSX
 
 Copyright (C) 2012 Oscar Campos <oscar.campos@member.fsf.org>
 
@@ -24,7 +24,7 @@ Unzip / git clone the SublimePySide directory into your ST2's Packages directory
 
 Then select the type of project you want to create and answer the questions.
 
-You can also use the Tools menu at the toolbar to create a new project.
+You can also use the Tools menu at the toolbar to create a new project. You can configure SublimePySide to always use PySide or PyQt4 in the plugin settings file or just let it asks you when you generate a new project.
 
 **IMPORTANT**: This plugin use SublimeRope if installed to generate Rope projects in an automatic way.
 

@@ -1,6 +1,6 @@
 import sys
 
-from PySide import QtCore
+from ${QT_LIBRARY} import QtCore
 
 if __name__ == '__main__':
 

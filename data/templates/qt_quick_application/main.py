@@ -1,8 +1,8 @@
 import sys
 
-from PySide.QtCore import QUrl
-from PySide.QtGui import QApplication
-from PySide.QtDeclarative import QDeclarativeView
+from ${QT_LIBRARY}.QtCore import QUrl
+from ${QT_LIBRARY}.QtGui import QApplication
+from ${QT_LIBRARY}.QtDeclarative import QDeclarativeView
 
 if __name__ == "__main__":
     app = QApplication([])

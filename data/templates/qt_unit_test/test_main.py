@@ -3,7 +3,7 @@
 
 import unittest
 
-from PySide.QtGui import *
+from ${QT_LIBRARY}.QtGui import *
 
 
 class QAppPresence(unittest.TestCase):
