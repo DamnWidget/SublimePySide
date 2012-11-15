@@ -6,7 +6,7 @@ status: beta
 Overview
 ========
 
-Sublime PySide adds Qt support for Sublime Text 2 on Python.
+Sublime PySide adds Qt (PySide and PyQt4) support for Sublime Text 2 on Python.
 
 Python support is build for PySide and PyQt4 as well. This has been tested on Linux and Mac OSX
 
