@@ -165,12 +165,8 @@ class MainWindow(QtGui.QMainWindow):
         settings = QtCore.QSettings("Trolltech", "${APP_NAME}")
         pos = settings.value("pos", QtCore.QPoint(200, 200))
         size = settings.value("size", QtCore.QSize(400, 400))
-        try:
-            self.resize(size.toSize())
-            self.move(pos.toPoint())
-        except AttributeError:
-            self.resize(size)
-            self.move(pos)
+        self.resize(size)
+        self.move(pos)
 
     def writeSettings(self):
         settings = QtCore.QSettings("Trolltech", "${APP_NAME}")

@@ -130,7 +130,6 @@ class CreateQtProjectThread(threading.Thread):
 
         self.proj_name = name
 
-        print 'Setting ' + str(get_settings('sublimepyside_library_asl', bool))
         if not get_settings('sublimepyside_library_ask', bool):
             self.generate_project()
         else:
@@ -172,12 +171,6 @@ class CreateQtProjectThread(threading.Thread):
                     '%s/%s.sublime-project' % (self.proj_dir, self.proj_name)
                 ]
             )
-
-            if ROPE_SUPPORT:
-                if sublime.ok_cancel_dialog(
-                    'Do you want to regenerate the {0} module cache '
-                        'now? (really recommended)'.format(self.proj_library)):
-                    self.window.run_command('python_generate_modules_cache')
         else:
             sublime.error_message(
                 'Could not create Qt Project files for template "{0}"'.format(
@@ -250,7 +243,9 @@ class Project(object):
                 try:
                     shutil.copytree(tpl, path)
                 except OSError, error:
-                    sublime.error_message(error)
+                    if error.errno != 17:
+                        message = '%d: %s' % (error.errno, error.strerror)
+                        sublime.error_message(message)
                 continue
 
             with open(tpl, 'r') as fhandler:
