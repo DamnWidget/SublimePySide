@@ -33,8 +33,8 @@ Features
 
 * QML file syntax highligth
 * QMLProject file syntax highlight
-* PySide Qt project creation
-* PySide autocompletion via SublimeRope
+* PySide and PyQt4 project creation
+* PySide and PyQt4 autocompletion via SublimeRope
 
 Supported Templates
 --------------------
