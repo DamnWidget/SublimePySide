@@ -229,8 +229,8 @@ class ConversionWorker(threading.Thread):
             else:
                 library = 'PyQt4'
 
-            if sublime.ok_cancel_dialog(
-                'Do you really want to convert thi file to %s' % library):
+            if sublime.ok_cancel_dialog('Do you really want to convert this '
+                                        'file to %s' % library):
                 self.qt_conversion()
 
         sublime.set_timeout(show_conversion_confirmation, 10)
@@ -298,7 +298,7 @@ class Project(object):
         if not self.ropemanager.is_supported():
             return
 
-        self.ropemanager.create_project(self.projectroot)
+        self.ropemanager.create_project(self.root)
 
     def generate_st2_project(self):
         """
@@ -460,7 +460,7 @@ class RopeManager(object):
             return
 
         try:
-            rope_project = rope.base.project.Project(projectroot=self.root)
+            rope_project = rope.base.project.Project(projectroot)
             rope_project.close()
         except (ResourceNotFoundError, RopeError), error:
             msg = 'Could not create rope project folder at {0}\nException: {1}'
