@@ -254,6 +254,28 @@ class PyQt42PySideWorker(ConversionWorker):
     def qt_conversion(self):
         """Converts Qt code"""
         pyqt2pyside.Converter(self.view).convert()
+        self.remove_api_imports()
+
+    def remove_api_imports(self):
+        """Remove api conversions for PyQt4 API 2"""
+
+        line_one = self.view.find('import sip', 0)
+        if not line_one:
+            line_one = self.view.find('from sip import setapi', 0)
+
+        # At this point we already changed PyQt4 occurrences to PySide
+        line_two = self.view.find('from PySide', 0)
+        if not line_two:
+            line_two = self.view.find('import PySide', 0)
+
+        if not line_one or not line_two:
+            return
+
+        region = sublime.Region(line_one.a, self.view.line(line_two).a)
+
+        edit = self.view.begin_edit()
+        self.view.erase(edit, region)
+        self.view.end_edit(edit)
 
 
 class PySide2PyQt4Worker(ConversionWorker):
@@ -468,7 +490,7 @@ class RopeManager(object):
 
     def insert_api_imports(self, view):
         """Insert api conversions for PyQt4 API 2"""
-
+        # TODO: Remove this from Rope and put it with remove_api in thread
         if not self.is_supported():
             return
 
