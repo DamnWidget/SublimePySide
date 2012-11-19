@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-from ${QT_LIBRARY} import QtCore, QtGui
+${PyQT_API_CHECK}from ${QT_LIBRARY} import QtCore, QtGui
 
 import application_rc
 

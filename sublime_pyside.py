@@ -23,6 +23,7 @@ try:
     from rope.base.exceptions import RopeError, ResourceNotFoundError
     ROPE_SUPPORT = True
 except ImportError:
+    from converter import pyqt2pyside, pyside2pyqt
     ROPE_SUPPORT = False
 
 
@@ -44,6 +45,34 @@ class CreateQtProjectCommand(sublime_plugin.WindowCommand):
         """WindowCommand entry point"""
 
         CreateQtProjectThread(self.window).start()
+
+
+class ConvertPyQt42PySideCommand(sublime_plugin.TextCommand):
+    """
+    Converts a PyQt4 buffer to PySide syntax
+    """
+
+    def __init__(self, *args, **kwargs):
+        sublime_plugin.TextCommand.__init__(self, *args, **kwargs)
+
+    def run(self, edit):
+        """Run the command"""
+
+        PyQt42PySideWorker(self.view).start()
+
+
+class ConvertPySide2PyQt4Command(sublime_plugin.TextCommand):
+    """
+    Converts a PySide buffer to PyQt4 syntax
+    """
+
+    def __init__(self, *args, **kwargs):
+        sublime_plugin.TextCommand.__init__(self, *args, **kwargs)
+
+    def run(self, edit):
+        """Run the command"""
+
+        PySide2PyQt4Worker(self.view).start()
 
 
 # =============================================================================
@@ -178,6 +207,55 @@ class CreateQtProjectThread(threading.Thread):
             )
 
 
+class ConversionWorker(threading.Thread):
+    """
+    Base worker class for PySide <--> PyQt4 converters
+    """
+    def __init__(self, view, library):
+        threading.Thread.__init__(self)
+
+        self.view = view
+        self.library = library
+
+    def run(self):
+        """
+        Starts the thread
+        """
+
+        def show_conversion_confirmation():
+            """Shows a confirmation dialog and proceed if true"""
+
+            if sublime.ok_cancel_dialog('Do you really want to convert thi '
+                                        'file to %s' % self.library):
+
+                lib = pyqt2pyside if self.library == 'PySide' else pyside2pyqt
+                lib.Converter(self.view).convert()
+
+        sublime.set_timeout(show_conversion_confirmation, 10)
+
+
+class PyQt42PySideWorker(ConversionWorker):
+    """
+    Worker class to convert PyQt4 buffer to PySide Syntax.
+
+    Note that there is not automatically conversion from PyQt API 1
+    to PySide yet so you should remove all the QVariant stuff yourself.
+    """
+    def __init__(self, view):
+        ConversionWorker.__init__(self, view, 'PyQt4')
+
+
+class PySide2PyQt4Worker(ConversionWorker):
+    """
+    Worker class to convert PySide buffer to PyQt4 Syntax.
+
+    The conversion is just to PyQt4 API 2 so if you're running Python 3
+    just remove the explicit api conversion lines.
+    """
+    def __init__(self, view):
+        ConversionWorker.__init__(self, view, 'PySide')
+
+
 # =============================================================================
 # Classes
 # =============================================================================
@@ -251,11 +329,30 @@ class Project(object):
             with open(tpl, 'r') as fhandler:
                 file_buffer = fhandler.read().replace(
                     '${APP_NAME}', self.name.encode('utf8')).replace(
-                        '${QT_LIBRARY}', self.lib)
+                        '${QT_LIBRARY}', self.lib).replace(
+                            '${PyQT_API_CHECK}', self.pyqt_api_check()
+                        )
 
             with open(path, 'w') as fhandler:
                 fhandler.write(file_buffer)
                 sublime.status_message('Copying {0} file...'.format(tpl))
+
+    def pyqt_api_check(self):
+        """
+        If PyQt4 is used then we add API 2
+        """
+
+        if self.lib == 'PyQt4':
+            return ("import sip\n"
+                    "sip.setapi('QString', 2)\n"
+                    "sip.setapi('QTextStream', 2)\n"
+                    "sip.setapi('QVariant', 2)\n"
+                    "sip.setapi('QTime', 2)\n"
+                    "sip.setapi('QDate', 2)\n"
+                    "sip.setapi('QDateTime', 2)\n"
+                    "sip.setapi('QUrl', 2)")
+
+        return ''
 
 
 class PySideProject(Project):

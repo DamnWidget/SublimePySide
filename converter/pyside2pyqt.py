@@ -15,7 +15,7 @@ class Converter(BaseConverter):
     Converts a PySide file to PyQt syntax
     """
 
-    def __init__(self, filebuffer):
+    def __init__(self, view):
         pattern = {
             'PySide': 'PyQt4',
             'Signal': 'pyqtSignal',
@@ -25,7 +25,7 @@ class Converter(BaseConverter):
             'pyside-rcc': 'pyrcc4',
             'pyside-lupdate': 'pylupdate4'
         }
-        super(Converter, self).__init__(filebuffer, pattern)
+        super(Converter, self).__init__(view, pattern)
 
     def convert(self):
         """Convert a PySide syntax file to PyQt4"""

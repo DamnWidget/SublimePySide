@@ -7,26 +7,26 @@
 Base class for converters
 """
 
-import re
-
 
 class BaseConverter(object):
     """
     Base class for PySide <--> PyQt4 converters
     """
 
-    def __init__(self, filebuffer, pattern):
+    def __init__(self, view, pattern):
         super(BaseConverter, self).__init__()
-        self.filebuffer = filebuffer
+        self.view = view
         self.pattern = pattern
 
     def convert(self):
         """Try to convert the file"""
 
-        regex = re.compile(
-            '(%s)' % '|'.join([re.escape(tk) for tk in self.pattern.keys()]))
+        edit = self.view.begin_edit()
+        for key in self.pattern:
+            matches = self.view.find_all(key)
+            matches.reverse()
 
-        return regex.sub(
-            lambda x: str(self.pattern[x.string[x.start():x.end()]]),
-            self.filebuffer
-        )
+            for item in matches:
+                self.view.replace(edit, item, self.pattern[key])
+
+        self.view.end_edit(edit)

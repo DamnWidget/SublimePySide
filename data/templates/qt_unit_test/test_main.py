@@ -3,7 +3,7 @@
 
 import unittest
 
-from ${QT_LIBRARY}.QtGui import *
+${PyQT_API_CHECK}from ${QT_LIBRARY}.QtGui import *
 
 
 class QAppPresence(unittest.TestCase):

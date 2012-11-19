@@ -1,6 +1,6 @@
 import sys
 
-from ${QT_LIBRARY} import QtCore
+${PyQT_API_CHECK}from ${QT_LIBRARY} import QtCore
 
 if __name__ == '__main__':
 

@@ -1,6 +1,6 @@
 import sys
 
-from ${QT_LIBRARY}.QtCore import QUrl
+${PyQT_API_CHECK}from ${QT_LIBRARY}.QtCore import QUrl
 from ${QT_LIBRARY}.QtGui import QApplication
 from ${QT_LIBRARY}.QtDeclarative import QDeclarativeView
 
