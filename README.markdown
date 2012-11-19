@@ -26,6 +26,22 @@ Then select the type of project you want to create and answer the questions.
 
 You can also use the Tools menu at the toolbar to create a new project. You can configure SublimePySide to always use PySide or PyQt4 in the plugin settings file or just let it asks you when you generate a new project.
 
+To convert PySide to PyQt4 syntax you can use the keybindings:
+
+    ctrl+shift+c, ctrl+shift+q on Linux
+    ctrl+super+c, ctrl+super+q on Mac OSX
+    ctrl+shift+c, ctrl+shift+q on Windows
+
+To convert PyQt4 to PySide eyntax you can use the keybindings:
+
+    ctrl+shift+c, ctrl+shift+p on Linux
+    ctrl+super+c, ctrl+super+p on Mac OSX
+    ctrl+shift+c, ctrl+shift+p on Windows
+
+
+**NOTES**: Conversion from PyQt4 API 1 QVariant toWhatever methods to PySide is not automatic yet so maybe you should edit your code by hand after conversion. PySide only converts to PyQt4 API 2.
+
+
 **IMPORTANT**: This plugin use SublimeRope if installed to generate Rope projects in an automatic way.
 
 Features
@@ -35,6 +51,8 @@ Features
 * QMLProject file syntax highlight
 * PySide and PyQt4 project creation
 * PySide and PyQt4 autocompletion via SublimeRope
+* PySide to PyQt4 syntax conversion
+* PyQt4 to PySide syntax conversion
 
 Supported Templates
 --------------------

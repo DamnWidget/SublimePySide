@@ -11,6 +11,14 @@
                     {
                         "caption": "Create Project",
                         "command": "create_qt_project"
+                    },
+                    {
+                        "caption": "Convert to PySide Syntax",
+                        "command": "convert_py_qt42_py_side"
+                    },
+                    {
+                        "caption": "Convert to PyQt4 Syntax",
+                        "command": "convert_py_side2_py_qt4"
                     }
                 ]
             }

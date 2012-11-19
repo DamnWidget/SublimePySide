@@ -1,5 +1,5 @@
 [
     { "keys": ["ctrl+alt+q"], "command": "create_qt_project" },
-    { "keys": ["ctrl+shift+c", "ctrl+shift+q"], "command": "convert_py_qt42_py_side"},
-    { "keys": ["ctrl+shift+c", "ctrl+shift+p"], "command": "convert_py_side2_py_qt4"}
+    { "keys": ["ctrl+shift+c", "ctrl+shift+q"], "command": "convert_py_side2_py_qt4"},
+    { "keys": ["ctrl+shift+c", "ctrl+shift+p"], "command": "convert_py_qt42_py_side"}
 ]

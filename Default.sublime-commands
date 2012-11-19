@@ -2,5 +2,13 @@
     {
         "caption": "SublimePySide: Create new Qt Project from template",
         "command": "create_qt_project"
+    },
+    {
+        "caption": "SublimePySide: Convert PyQt4 to PySide syntax",
+        "command": "convert_py_qt42_py_side"
+    },
+    {
+        "caption": "SublimePySide: Convert PySide to PyQt4 syntax",
+        "command": "convert_py_side2_py_qt4"
     }
 ]

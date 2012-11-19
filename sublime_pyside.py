@@ -242,7 +242,7 @@ class PyQt42PySideWorker(ConversionWorker):
     to PySide yet so you should remove all the QVariant stuff yourself.
     """
     def __init__(self, view):
-        ConversionWorker.__init__(self, view, 'PyQt4')
+        ConversionWorker.__init__(self, view, 'PySide')
 
 
 class PySide2PyQt4Worker(ConversionWorker):
@@ -253,7 +253,7 @@ class PySide2PyQt4Worker(ConversionWorker):
     just remove the explicit api conversion lines.
     """
     def __init__(self, view):
-        ConversionWorker.__init__(self, view, 'PySide')
+        ConversionWorker.__init__(self, view, 'PyQt4')
 
 
 # =============================================================================
