@@ -7,6 +7,19 @@
 Base class for converters
 """
 
+sip_api_2 = '''# PyQT4 API 2 SetUp. Comment on remove if you are using Python 3
+import sip
+
+sip.setapi('QString', 2)
+sip.setapi('QTextStream', 2)
+sip.setapi('QVariant', 2)
+sip.setapi('QTime', 2)
+sip.setapi('QDate', 2)
+sip.setapi('QDateTime', 2)
+sip.setapi('QUrl', 2)
+
+'''
+
 
 class BaseConverter(object):
     """

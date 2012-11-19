@@ -20,11 +20,14 @@ import sublime_plugin
 
 try:
     import rope
+    import ropemate
     from rope.base.exceptions import RopeError, ResourceNotFoundError
     ROPE_SUPPORT = True
 except ImportError:
-    from converter import pyqt2pyside, pyside2pyqt
     ROPE_SUPPORT = False
+
+from converter import pyqt2pyside, pyside2pyqt
+from converter.base import sip_api_2
 
 
 # =============================================================================
@@ -32,7 +35,7 @@ except ImportError:
 # =============================================================================
 class CreateQtProjectCommand(sublime_plugin.WindowCommand):
     """
-    Creates a new PySide application from a template
+    Creates a new PySide/PyQt4 application from a template
     """
 
     def __init__(self, window):
@@ -189,9 +192,7 @@ class CreateQtProjectThread(threading.Thread):
             project.generate_project()
 
             project.generate_st2_project()
-
-            if ROPE_SUPPORT:
-                project.generate_rope_project()
+            project.generate_rope_project()
 
             subprocess.Popen(
                 [
@@ -211,11 +212,9 @@ class ConversionWorker(threading.Thread):
     """
     Base worker class for PySide <--> PyQt4 converters
     """
-    def __init__(self, view, library):
+    def __init__(self, view):
         threading.Thread.__init__(self)
-
         self.view = view
-        self.library = library
 
     def run(self):
         """
@@ -225,13 +224,21 @@ class ConversionWorker(threading.Thread):
         def show_conversion_confirmation():
             """Shows a confirmation dialog and proceed if true"""
 
-            if sublime.ok_cancel_dialog('Do you really want to convert thi '
-                                        'file to %s' % self.library):
+            if self.__class__.__name__ == 'PyQt42PySideWorker':
+                library = 'PySide'
+            else:
+                library = 'PyQt4'
 
-                lib = pyqt2pyside if self.library == 'PySide' else pyside2pyqt
-                lib.Converter(self.view).convert()
+            if sublime.ok_cancel_dialog(
+                'Do you really want to convert thi file to %s' % library):
+                self.qt_conversion()
 
         sublime.set_timeout(show_conversion_confirmation, 10)
+
+    def qt_conversion(self):
+        """Must be reimplemnted"""
+
+        raise NotImplementedError('qt_conversion not implemented yet')
 
 
 class PyQt42PySideWorker(ConversionWorker):
@@ -242,7 +249,11 @@ class PyQt42PySideWorker(ConversionWorker):
     to PySide yet so you should remove all the QVariant stuff yourself.
     """
     def __init__(self, view):
-        ConversionWorker.__init__(self, view, 'PySide')
+        ConversionWorker.__init__(self, view)
+
+    def qt_conversion(self):
+        """Converts Qt code"""
+        pyqt2pyside.Converter(self.view).convert()
 
 
 class PySide2PyQt4Worker(ConversionWorker):
@@ -253,7 +264,13 @@ class PySide2PyQt4Worker(ConversionWorker):
     just remove the explicit api conversion lines.
     """
     def __init__(self, view):
-        ConversionWorker.__init__(self, view, 'PyQt4')
+        ConversionWorker.__init__(self, view)
+
+    def qt_conversion(self):
+        """Converts Qt code"""
+        pyside2pyqt.Converter(self.view).convert()
+        ropemanager = RopeManager()
+        ropemanager.insert_api_imports(self.view)
 
 
 # =============================================================================
@@ -270,6 +287,7 @@ class Project(object):
         self.root = root
         self.name = name
         self.tplmanager = tplmanager
+        self.ropemanager = RopeManager()
         self.lib = None
 
     def generate_rope_project(self):
@@ -277,15 +295,10 @@ class Project(object):
         Create Rope project structure
         """
 
-        if not ROPE_SUPPORT:
+        if not self.ropemanager.is_supported():
             return
 
-        try:
-            rope_project = rope.base.project.Project(projectroot=self.root)
-            rope_project.close()
-        except (ResourceNotFoundError, RopeError), error:
-            msg = 'Could not create rope project folder at {0}\nException: {1}'
-            sublime.status_message(msg.format(self.root, str(error)))
+        self.ropemanager.create_project(self.projectroot)
 
     def generate_st2_project(self):
         """
@@ -343,14 +356,7 @@ class Project(object):
         """
 
         if self.lib == 'PyQt4':
-            return ("import sip\n"
-                    "sip.setapi('QString', 2)\n"
-                    "sip.setapi('QTextStream', 2)\n"
-                    "sip.setapi('QVariant', 2)\n"
-                    "sip.setapi('QTime', 2)\n"
-                    "sip.setapi('QDate', 2)\n"
-                    "sip.setapi('QDateTime', 2)\n"
-                    "sip.setapi('QUrl', 2)")
+            return sip_api_2
 
         return ''
 
@@ -429,6 +435,57 @@ class TplManager(object):
 
         return (self.selected.replace(' ', '_').lower()
                 if dir_conversion else self.selected)
+
+
+class RopeManager(object):
+    """
+    Manager for rope/SublimeRope features
+    """
+
+    def __init__(self):
+        super(RopeManager, self).__init__()
+        self.supported = ROPE_SUPPORT
+
+    def is_supported(self):
+        """Returns true if rope is supported, otherwise returns false"""
+
+        return self.supported
+
+    def create_project(self, projectroot=None):
+        """
+        Create a new Rope project
+        """
+
+        if not projectroot or not self.supported:
+            return
+
+        try:
+            rope_project = rope.base.project.Project(projectroot=self.root)
+            rope_project.close()
+        except (ResourceNotFoundError, RopeError), error:
+            msg = 'Could not create rope project folder at {0}\nException: {1}'
+            sublime.status_message(msg.format(self.root, str(error)))
+
+    def insert_api_imports(self, view):
+        """Insert api conversions for PyQt4 API 2"""
+
+        if not self.is_supported():
+            return
+
+        with ropemate.context_for(view) as context:
+            all_lines = view.lines(sublime.Region(0, view.size()))
+            line_no = context.importer.find_insertion_line(context.input)
+            insert_import_str = sip_api_2
+            existing_imports_str = view.substr(
+                sublime.Region(all_lines[0].a, all_lines[line_no - 1].b))
+
+            if insert_import_str.rstrip() in existing_imports_str:
+                return
+
+            insert_import_point = all_lines[line_no - 1].a
+            edit = view.begin_edit()
+            view.insert(edit, insert_import_point, insert_import_str)
+            view.end_edit(edit)
 
 
 # =============================================================================

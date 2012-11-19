@@ -32,7 +32,7 @@ To convert PySide to PyQt4 syntax you can use the keybindings:
     ctrl+super+c, ctrl+super+q on Mac OSX
     ctrl+shift+c, ctrl+shift+q on Windows
 
-To convert PyQt4 to PySide eyntax you can use the keybindings:
+To convert PyQt4 to PySide syntax you can use the keybindings:
 
     ctrl+shift+c, ctrl+shift+p on Linux
     ctrl+super+c, ctrl+super+p on Mac OSX
