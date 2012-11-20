@@ -291,8 +291,29 @@ class PySide2PyQt4Worker(ConversionWorker):
     def qt_conversion(self):
         """Converts Qt code"""
         pyside2pyqt.Converter(self.view).convert()
-        ropemanager = RopeManager()
-        ropemanager.insert_api_imports(self.view)
+        self.insert_api_imports()
+
+    def insert_api_imports(self):
+        """Insert api conversions for PyQt4 API 2"""
+
+        pyqt4import = self.view.find('from PyQt4', 0)
+        if not pyqt4import:
+            pyqt4import = self.view.find('import PyQt4', 0)
+            if not pyqt4import:
+                return
+
+        prior_lines = self.view.lines(sublime.Region(0, pyqt4import.a))
+        insert_import_str = sip_api_2
+        existing_imports_str = self.view.substr(
+            sublime.Region(prior_lines[0].a, prior_lines[-1].b))
+
+        if insert_import_str.rstrip() in existing_imports_str:
+            return
+
+        insert_import_point = prior_lines[-1].a
+        edit = self.view.begin_edit()
+        self.view.insert(edit, insert_import_point, insert_import_str)
+        self.view.end_edit(edit)
 
 
 # =============================================================================
@@ -487,27 +508,6 @@ class RopeManager(object):
         except (ResourceNotFoundError, RopeError), error:
             msg = 'Could not create rope project folder at {0}\nException: {1}'
             sublime.status_message(msg.format(self.root, str(error)))
-
-    def insert_api_imports(self, view):
-        """Insert api conversions for PyQt4 API 2"""
-        # TODO: Remove this from Rope and put it with remove_api in thread
-        if not self.is_supported():
-            return
-
-        with ropemate.context_for(view) as context:
-            all_lines = view.lines(sublime.Region(0, view.size()))
-            line_no = context.importer.find_insertion_line(context.input)
-            insert_import_str = sip_api_2
-            existing_imports_str = view.substr(
-                sublime.Region(all_lines[0].a, all_lines[line_no - 1].b))
-
-            if insert_import_str.rstrip() in existing_imports_str:
-                return
-
-            insert_import_point = all_lines[line_no - 1].a
-            edit = view.begin_edit()
-            view.insert(edit, insert_import_point, insert_import_str)
-            view.end_edit(edit)
 
 
 # =============================================================================

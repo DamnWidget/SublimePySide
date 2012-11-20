@@ -58,7 +58,7 @@ Supported Templates
 --------------------
 
 * Qt Quick Application (Python + QML)
-* Qt Uick UI (Pure QML)
+* Qt Quick UI (Pure QML)
 * Qt Gui Application (Pure Python)
 * Qt Console Application (Pure Python)
 * Qt Unit Test (dumb skeleton)
