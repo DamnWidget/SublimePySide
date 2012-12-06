@@ -327,6 +327,10 @@ class Project(object):
     def __init__(self, root, name, tplmanager):
         super(Project, self).__init__()
 
+        if sublime.platform() == 'windows':
+            # os.path.normpath is not working
+            root = root.replace('\\', '/')
+
         self.root = root
         self.name = name
         self.tplmanager = tplmanager
