@@ -7,7 +7,7 @@
 Converts a PySide script to PyQt
 """
 
-from converter.base import BaseConverter
+from PySide.converter.base import BaseConverter
 
 
 class Converter(BaseConverter):

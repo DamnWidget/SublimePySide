@@ -26,8 +26,8 @@ try:
 except ImportError:
     ROPE_SUPPORT = False
 
-from converter import pyqt2pyside, pyside2pyqt
-from converter.base import sip_api_2
+from PySide.converter import pyqt2pyside, pyside2pyqt
+from PySide.converter.base import sip_api_2
 
 
 # =============================================================================
@@ -194,6 +194,11 @@ class CreateQtProjectThread(threading.Thread):
             project.generate_st2_project()
             project.generate_rope_project()
 
+            print('{} -- project {}/{}.sublime-project'.format(
+                sublime_executable_path(),
+                self.proj_dir,
+                self.proj_name
+            ))
             subprocess.Popen(
                 [
                     sublime_executable_path(),
@@ -355,15 +360,15 @@ class Project(object):
                 sublime.status_message('Copying {0} tree...'.format(tpl))
                 try:
                     shutil.copytree(tpl, path)
-                except OSError, error:
+                except OSError as error:
                     if error.errno != 17:
                         message = '%d: %s' % (error.errno, error.strerror)
                         sublime.error_message(message)
                 continue
 
-            with open(tpl, 'r') as fhandler:
+            with open(tpl, 'r', encoding='utf-8') as fhandler:
                 file_buffer = fhandler.read().replace(
-                    '${APP_NAME}', self.name.encode('utf8')).replace(
+                    '${APP_NAME}', self.name).replace(
                         '${QT_LIBRARY}', self.lib).replace(
                             '${PyQT_API_CHECK}', self.pyqt_api_check()
                         )
@@ -484,7 +489,7 @@ class RopeManager(object):
         try:
             rope_project = rope.base.project.Project(projectroot)
             rope_project.close()
-        except (ResourceNotFoundError, RopeError), error:
+        except (ResourceNotFoundError, RopeError) as error:
             msg = 'Could not create rope project folder at {0}\nException: {1}'
             sublime.status_message(msg.format(self.root, str(error)))
 
@@ -527,9 +532,17 @@ def sublime_executable_path():
         else:
             return error
 
+    # in Sublime Text 3 the process that executes plugins is not sublime_text
+    # is just `plugin_host` so we need just to hardcode it for the moment
+    # until we think in a better way to do it
     if platform == 'linux':
         if os.path.exists('/proc/self/cmdline'):
-            return open('/proc/self/cmdline').read().split(chr(0))[0]
+            plugin_host = open('/proc/self/cmdline').read().split(chr(0))[0]
+            plugin_host = '{}/sublime_text'.format(
+                '/'.join(plugin_host.split('/')[:-1])
+            )
+
+            return plugin_host
 
     return sys.executable
 
