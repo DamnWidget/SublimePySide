@@ -7,7 +7,14 @@
 Converts a PySide script to PyQt
 """
 
-from PySide.converter.base import BaseConverter
+import sys
+
+if sys.version_info < (3, 3):
+    from converter.base import BaseConverter
+    ST3 = False
+else:
+    from PySide.converter.base import BaseConverter
+    ST3 = True
 
 
 class Converter(BaseConverter):
@@ -30,7 +37,7 @@ class Converter(BaseConverter):
     def convert(self):
         """Convert a PySide syntax file to PyQt4"""
 
-        return super(Converter, self).convert()
+        return super(Converter, self).convert(ST3)
 
     def original_file(self):
         """Returns the original (unchanged) file"""

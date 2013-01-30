@@ -31,10 +31,13 @@ class BaseConverter(object):
         self.view = view
         self.pattern = pattern
 
-    def convert(self):
+    def convert(self, ST3):
         """Try to convert the file"""
 
-        edit = self.view.begin_edit()
+        if ST3 is False:
+            edit = self.view.begin_edit()
+        else:
+            edit = self.view.begin_edit(1, 'QtConverter')
         for key in self.pattern:
             matches = self.view.find_all(key)
             matches.reverse()

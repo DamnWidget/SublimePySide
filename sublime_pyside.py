@@ -26,8 +26,15 @@ try:
 except ImportError:
     ROPE_SUPPORT = False
 
-from PySide.converter import pyqt2pyside, pyside2pyqt
-from PySide.converter.base import sip_api_2
+
+if sys.version_info < (3, 3):
+    from converter import pyqt2pyside, pyside2pyqt
+    from converter.base import sip_api_2
+    ST3 = False
+else:
+    from PySide.converter import pyqt2pyside, pyside2pyqt
+    from PySide.converter.base import sip_api_2
+    ST3 = True
 
 
 # =============================================================================
@@ -194,11 +201,6 @@ class CreateQtProjectThread(threading.Thread):
             project.generate_st2_project()
             project.generate_rope_project()
 
-            print('{} -- project {}/{}.sublime-project'.format(
-                sublime_executable_path(),
-                self.proj_dir,
-                self.proj_name
-            ))
             subprocess.Popen(
                 [
                     sublime_executable_path(),
@@ -366,9 +368,13 @@ class Project(object):
                         sublime.error_message(message)
                 continue
 
-            with open(tpl, 'r', encoding='utf-8') as fhandler:
+            with open(tpl, 'r') as fhandler:
+                app_name = (
+                    self.name.encode('utf-8') if ST3 is False else self.name
+                )
+
                 file_buffer = fhandler.read().replace(
-                    '${APP_NAME}', self.name).replace(
+                    '${APP_NAME}', app_name).replace(
                         '${QT_LIBRARY}', self.lib).replace(
                             '${PyQT_API_CHECK}', self.pyqt_api_check()
                         )
@@ -537,12 +543,16 @@ def sublime_executable_path():
     # until we think in a better way to do it
     if platform == 'linux':
         if os.path.exists('/proc/self/cmdline'):
-            plugin_host = open('/proc/self/cmdline').read().split(chr(0))[0]
-            plugin_host = '{}/sublime_text'.format(
-                '/'.join(plugin_host.split('/')[:-1])
-            )
+            if ST3 is True:
+                plugin_host = open(
+                    '/proc/self/cmdline').read().split(chr(0))[0]
+                plugin_host = '{}/sublime_text'.format(
+                    '/'.join(plugin_host.split('/')[:-1])
+                )
 
-            return plugin_host
+                return plugin_host
+            else:
+                return open('/proc/self/cmdline').read().split(chr(0))[0]
 
     return sys.executable
 
