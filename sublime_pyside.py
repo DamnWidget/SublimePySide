@@ -374,6 +374,7 @@ class PySide2PyQt4Worker(ConversionWorker):
             return
 
         insert_import_point = prior_lines[-1].a
+
         edit = self.view.begin_edit() if self.edit is None else self.edit
         self.view.insert(edit, insert_import_point, insert_import_str)
         self.view.end_edit(edit)
@@ -389,6 +390,10 @@ class Project(object):
 
     def __init__(self, root, name, tplmanager):
         super(Project, self).__init__()
+
+        if sublime.platform() == 'windows':
+            # os.path.normpath is not working
+            root = root.replace('\\', '/')
 
         self.root = root
         self.name = name

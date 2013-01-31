@@ -10,6 +10,8 @@ Sublime PySide adds Qt (PySide and PyQt4) support for Sublime Text 2 and Sublime
 
 Python support is build for PySide and PyQt4 as well. This has been tested on Linux and Mac OSX
 
+**Sublime Text 3**: If you are looking for the Sublime Text 3 version just donwload the **ST3** branch to your ``Packages`` directory and rename it to ``PySide``
+
 Copyright (C) 2012 Oscar Campos <oscar.campos@member.fsf.org>
 
 **WARNING**: SublimeRope features doesn't work in Sublime Text 3. When convert a file from PySide to PyQt4 or viceversa in Sublime Text 3, you should save the file and reopen it again because the cursor is lost (trying to fix it already).
@@ -60,7 +62,7 @@ Supported Templates
 --------------------
 
 * Qt Quick Application (Python + QML)
-* Qt Uick UI (Pure QML)
+* Qt Quick UI (Pure QML)
 * Qt Gui Application (Pure Python)
 * Qt Console Application (Pure Python)
 * Qt Unit Test (dumb skeleton)
