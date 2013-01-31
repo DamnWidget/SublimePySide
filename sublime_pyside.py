@@ -30,11 +30,11 @@ except ImportError:
 if sys.version_info < (3, 3):
     from converter import pyqt2pyside, pyside2pyqt
     from converter.base import sip_api_2
-    ST3 = False
+    SUBLIME_TEXT_3 = False
 else:
     from PySide.converter import pyqt2pyside, pyside2pyqt
     from PySide.converter.base import sip_api_2
-    ST3 = True
+    SUBLIME_TEXT_3 = True
 
 
 # =============================================================================
@@ -68,7 +68,10 @@ class ConvertPyQt42PySideCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         """Run the command"""
 
-        PyQt42PySideWorker(self.view).start()
+        if SUBLIME_TEXT_3 is False:
+            PyQt42PySideWorker(self.view).start()
+        else:
+            PyQt42PySideWorker(self.view, edit).run()
 
 
 class ConvertPySide2PyQt4Command(sublime_plugin.TextCommand):
@@ -82,7 +85,10 @@ class ConvertPySide2PyQt4Command(sublime_plugin.TextCommand):
     def run(self, edit):
         """Run the command"""
 
-        PySide2PyQt4Worker(self.view).start()
+        if SUBLIME_TEXT_3 is False:
+            PySide2PyQt4Worker(self.view).start()
+        else:
+            PySide2PyQt4Worker(self.view, edit).run()
 
 
 # =============================================================================
@@ -136,8 +142,8 @@ class CreateQtProjectThread(threading.Thread):
         self.tplmanager.selected = tpl_list[picked].split('::')[0]
 
         suggest = self.folders[0] if self.folders else os.path.expanduser('~')
-        self.window.show_input_panel('Project root:', suggest,
-                                     self.entered_proj_dir, None, None)
+        self.window.show_input_panel(
+            'Project root:', suggest, self.entered_proj_dir, None, None)
 
     def entered_proj_dir(self, path):
         """Called when user select an option in the quick panel"""
@@ -215,37 +221,81 @@ class CreateQtProjectThread(threading.Thread):
             )
 
 
-class ConversionWorker(threading.Thread):
-    """
-    Base worker class for PySide <--> PyQt4 converters
-    """
-    def __init__(self, view):
-        threading.Thread.__init__(self)
-        self.view = view
-
-    def run(self):
+# =============================================================================
+# Sublime Text 2 specific code
+# =============================================================================
+if SUBLIME_TEXT_3 is False:
+    class ConversionWorker(threading.Thread):
         """
-        Starts the thread
+        Base worker class for PySide <--> PyQt4 converters
+
+        This is only used in Sublime Text 2
         """
+        def __init__(self, view):
+            threading.Thread.__init__(self)
+            self.view = view
 
-        def show_conversion_confirmation():
-            """Shows a confirmation dialog and proceed if true"""
+        def run(self):
+            """
+            Starts the thread
+            """
 
-            if self.__class__.__name__ == 'PyQt42PySideWorker':
-                library = 'PySide'
-            else:
-                library = 'PyQt4'
+            def show_conversion_confirmation():
+                """Shows a confirmation dialog and proceed if true"""
 
-            if sublime.ok_cancel_dialog('Do you really want to convert this '
-                                        'file to %s' % library):
-                self.qt_conversion()
+                if self.__class__.__name__ == 'PyQt42PySideWorker':
+                    library = 'PySide'
+                else:
+                    library = 'PyQt4'
 
-        sublime.set_timeout(show_conversion_confirmation, 10)
+                if sublime.ok_cancel_dialog(
+                    'Do you really want to convert this file to %s' % library
+                ):
+                    self.qt_conversion()
 
-    def qt_conversion(self):
-        """Must be reimplemnted"""
+            sublime.set_timeout(show_conversion_confirmation, 10)
 
-        raise NotImplementedError('qt_conversion not implemented yet')
+        def qt_conversion(self):
+            """Must be reimplemnted"""
+
+            raise NotImplementedError('qt_conversion not implemented yet')
+# =============================================================================
+# Sublime Text 3 specific code
+# =============================================================================
+else:
+    class ConversionWorker(object):
+        """
+        Base worker class for PySide <--> PyQt4 converters
+
+        This is only used in Sublime Text 3
+        """
+        def __init__(self, view):
+            self.view = view
+
+        def run(self):
+            """
+            Starts the thread
+            """
+
+            def show_conversion_confirmation():
+                """Shows a confirmation dialog and proceed if true"""
+
+                if self.__class__.__name__ == 'PyQt42PySideWorker':
+                    library = 'PySide'
+                else:
+                    library = 'PyQt4'
+
+                if sublime.ok_cancel_dialog(
+                    'Do you really want to convert this file to %s' % library
+                ):
+                    self.qt_conversion()
+
+            show_conversion_confirmation()
+
+        def qt_conversion(self):
+            """Must be reimplemnted"""
+
+            raise NotImplementedError('qt_conversion not implemented yet')
 
 
 class PyQt42PySideWorker(ConversionWorker):
@@ -254,13 +304,16 @@ class PyQt42PySideWorker(ConversionWorker):
 
     Note that there is not automatically conversion from PyQt API 1
     to PySide yet so you should remove all the QVariant stuff yourself.
+
+    This class is only used in Sublime Text 2
     """
-    def __init__(self, view):
+    def __init__(self, view, edit=None):
         ConversionWorker.__init__(self, view)
+        self.edit = edit
 
     def qt_conversion(self):
         """Converts Qt code"""
-        pyqt2pyside.Converter(self.view).convert()
+        pyqt2pyside.Converter(self.view).convert(self.edit)
         self.remove_api_imports()
 
     def remove_api_imports(self):
@@ -280,7 +333,7 @@ class PyQt42PySideWorker(ConversionWorker):
 
         region = sublime.Region(line_one.a, self.view.line(line_two).a)
 
-        edit = self.view.begin_edit()
+        edit = self.view.begin_edit() if self.edit is None else self.edit
         self.view.erase(edit, region)
         self.view.end_edit(edit)
 
@@ -291,15 +344,39 @@ class PySide2PyQt4Worker(ConversionWorker):
 
     The conversion is just to PyQt4 API 2 so if you're running Python 3
     just remove the explicit api conversion lines.
+
+    This class is only used in Sublime Text 2
     """
-    def __init__(self, view):
+    def __init__(self, view, edit=None):
         ConversionWorker.__init__(self, view)
+        self.edit = edit
 
     def qt_conversion(self):
         """Converts Qt code"""
-        pyside2pyqt.Converter(self.view).convert()
-        ropemanager = RopeManager()
-        ropemanager.insert_api_imports(self.view)
+        pyside2pyqt.Converter(self.view).convert(self.edit)
+        self.insert_api_imports()
+
+    def insert_api_imports(self):
+        """Insert api conversions for PyQt4 API 2"""
+
+        pyqt4import = self.view.find('from PyQt4', 0)
+        if not pyqt4import:
+            pyqt4import = self.view.find('import PyQt4', 0)
+            if not pyqt4import:
+                return
+
+        prior_lines = self.view.lines(sublime.Region(0, pyqt4import.a))
+        insert_import_str = sip_api_2
+        existing_imports_str = self.view.substr(
+            sublime.Region(prior_lines[0].a, prior_lines[-1].b))
+
+        if insert_import_str.rstrip() in existing_imports_str:
+            return
+
+        insert_import_point = prior_lines[-1].a
+        edit = self.view.begin_edit() if self.edit is None else self.edit
+        self.view.insert(edit, insert_import_point, insert_import_str)
+        self.view.end_edit(edit)
 
 
 # =============================================================================
@@ -370,7 +447,7 @@ class Project(object):
 
             with open(tpl, 'r') as fhandler:
                 app_name = (
-                    self.name.encode('utf-8') if ST3 is False else self.name
+                    self.name.encode('utf-8') if SUBLIME_TEXT_3 is False else self.name
                 )
 
                 file_buffer = fhandler.read().replace(
@@ -499,27 +576,6 @@ class RopeManager(object):
             msg = 'Could not create rope project folder at {0}\nException: {1}'
             sublime.status_message(msg.format(self.root, str(error)))
 
-    def insert_api_imports(self, view):
-        """Insert api conversions for PyQt4 API 2"""
-        # TODO: Remove this from Rope and put it with remove_api in thread
-        if not self.is_supported():
-            return
-
-        with ropemate.context_for(view) as context:
-            all_lines = view.lines(sublime.Region(0, view.size()))
-            line_no = context.importer.find_insertion_line(context.input)
-            insert_import_str = sip_api_2
-            existing_imports_str = view.substr(
-                sublime.Region(all_lines[0].a, all_lines[line_no - 1].b))
-
-            if insert_import_str.rstrip() in existing_imports_str:
-                return
-
-            insert_import_point = all_lines[line_no - 1].a
-            edit = view.begin_edit()
-            view.insert(edit, insert_import_point, insert_import_str)
-            view.end_edit(edit)
-
 
 # =============================================================================
 # Global functions
@@ -543,7 +599,7 @@ def sublime_executable_path():
     # until we think in a better way to do it
     if platform == 'linux':
         if os.path.exists('/proc/self/cmdline'):
-            if ST3 is True:
+            if SUBLIME_TEXT_3 is True:
                 plugin_host = open(
                     '/proc/self/cmdline').read().split(chr(0))[0]
                 plugin_host = '{}/sublime_text'.format(

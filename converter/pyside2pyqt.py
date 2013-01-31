@@ -11,10 +11,8 @@ import sys
 
 if sys.version_info < (3, 3):
     from converter.base import BaseConverter
-    ST3 = False
 else:
     from PySide.converter.base import BaseConverter
-    ST3 = True
 
 
 class Converter(BaseConverter):
@@ -34,10 +32,10 @@ class Converter(BaseConverter):
         }
         super(Converter, self).__init__(view, pattern)
 
-    def convert(self):
+    def convert(self, edit):
         """Convert a PySide syntax file to PyQt4"""
 
-        return super(Converter, self).convert(ST3)
+        return super(Converter, self).convert(edit)
 
     def original_file(self):
         """Returns the original (unchanged) file"""
