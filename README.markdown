@@ -12,7 +12,7 @@ Python support is build for PySide and PyQt4 as well. This has been tested on Li
 
 **Sublime Text 3**: This plugin works on Sublime Text 3 as well as Sublime Text 2 you should only install it from Package Control as usual.
 
-Copyright (C) 2012 Oscar Campos <oscar.campos@member.fsf.org>
+Copyright (C) 2012 - 2013 Oscar Campos <oscar.campos@member.fsf.org>
 
 **WARNING**: SublimeRope features doesn't work in Sublime Text 3. When convert a file from PySide to PyQt4 or viceversa in Sublime Text 3, you should save the file and reopen it again because the cursor is lost (trying to fix it already).
 
