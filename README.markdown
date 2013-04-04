@@ -10,7 +10,7 @@ Sublime PySide adds Qt (PySide and PyQt4) support for Sublime Text 2 and Sublime
 
 Python support is build for PySide and PyQt4 as well. This has been tested on Linux and Mac OSX
 
-**Sublime Text 3**: If you are looking for the Sublime Text 3 version just donwload the **ST3** branch to your ``Packages`` directory and rename it to ``PySide``
+**Sublime Text 3**: This plugin works on Sublime Text 3 as well as Sublime Text 2 you should only install it from Package Control as usual.
 
 Copyright (C) 2012 Oscar Campos <oscar.campos@member.fsf.org>
 
