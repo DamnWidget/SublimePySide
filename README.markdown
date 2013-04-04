@@ -46,7 +46,7 @@ To convert PyQt4 to PySide syntax you can use the keybindings:
 **NOTES**: Conversion from PyQt4 API 1 QVariant toWhatever methods to PySide is not automatic yet so maybe you should edit your code by hand after conversion. PySide only converts to PyQt4 API 2.
 
 
-**IMPORTANT**: This plugin use SublimeRope if installed to generate Rope projects in an automatic way.
+**IMPORTANT**: This plugin use SublimeRope if installed to generate Rope projects in an automatic way. Note that this behaviour is only true in Sublime Text 2, in Sublime Text 3 you don't have the need to create SublimeRope projects if you are using SublimePython (the Sublime Text 3 version of SublimeRope)
 
 Features
 ----------
