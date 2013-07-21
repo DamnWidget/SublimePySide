@@ -4,7 +4,7 @@
 # This plugin is Free Software see LICENSE file for details
 
 """
-Sublime PySide adds support for Nokia's PySide and Riberbancks PyQt libraries
+Sublime PySide adds support for Digia's PySide and Riberbancks PyQt libraries
 """
 
 import os
@@ -21,6 +21,7 @@ import sublime_plugin
 try:
     import rope
     import ropemate
+    assert ropemate
     from rope.base.exceptions import RopeError, ResourceNotFoundError
     ROPE_SUPPORT = True
 except ImportError:
@@ -110,7 +111,7 @@ class CreateQtProjectThread(threading.Thread):
         self.proj_dir = None
         self.proj_name = None
         self.proj_library = get_settings('sublimepyside_library')
-        self.library_options = ['Use Nokia\'s PySide', 'Use RiverBank PyQt4']
+        self.library_options = ['Use Digia\'s PySide', 'Use RiverBank PyQt4']
 
         threading.Thread.__init__(self)
 
