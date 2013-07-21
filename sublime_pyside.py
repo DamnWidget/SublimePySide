@@ -452,7 +452,8 @@ class Project(object):
 
             with open(tpl, 'r') as fhandler:
                 app_name = (
-                    self.name.encode('utf-8') if SUBLIME_TEXT_3 is False else self.name
+                    self.name.encode('utf-8')
+                    if SUBLIME_TEXT_3 is False else self.name
                 )
 
                 file_buffer = fhandler.read().replace(
