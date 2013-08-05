@@ -14,5 +14,9 @@
     {
         "caption": "SublimePySide: Open file with Qt Designer",
         "command": "open_file_in_designer"
+    },
+    {
+        "caption": "SublimePySide: Create new Qt Designer file from template",
+        "command": "new_dialog"
     }
 ]

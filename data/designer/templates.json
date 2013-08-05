@@ -1,0 +1,10 @@
+{
+    "templates_list": [
+        "Dialog with buttons bottom",
+        "Dialog with buttons right",
+        "Dialog without buttons",
+        "Main window",
+        "Widget"
+    ],
+    "widgets": []
+}
