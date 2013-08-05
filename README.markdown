@@ -57,6 +57,7 @@ Features
 * PySide and PyQt4 autocompletion via SublimeRope
 * PySide to PyQt4 syntax conversion
 * PyQt4 to PySide syntax conversion
+* Open ui files with Qt Designer if installed (and itś path configured)
 
 Supported Templates
 --------------------

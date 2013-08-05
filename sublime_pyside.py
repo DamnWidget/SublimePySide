@@ -47,20 +47,21 @@ class CreateQtProjectCommand(sublime_plugin.WindowCommand):
     """
 
     def __init__(self, window):
-        """Constructor"""
+        """Constructor
+        """
 
         sublime_plugin.WindowCommand.__init__(self, window)
         self.window = window
 
     def run(self):
-        """WindowCommand entry point"""
+        """WindowCommand entry point
+        """
 
         CreateQtProjectThread(self.window).start()
 
 
 class ConvertPyQt42PySideCommand(sublime_plugin.TextCommand):
-    """
-    Converts a PyQt4 buffer to PySide syntax
+    """Converts a PyQt4 buffer to PySide syntax
     """
 
     def __init__(self, *args, **kwargs):
@@ -76,20 +77,38 @@ class ConvertPyQt42PySideCommand(sublime_plugin.TextCommand):
 
 
 class ConvertPySide2PyQt4Command(sublime_plugin.TextCommand):
-    """
-    Converts a PySide buffer to PyQt4 syntax
+    """Converts a PySide buffer to PyQt4 syntax
     """
 
     def __init__(self, *args, **kwargs):
         sublime_plugin.TextCommand.__init__(self, *args, **kwargs)
 
     def run(self, edit):
-        """Run the command"""
+        """Run the command
+        """
 
         if SUBLIME_TEXT_3 is False:
             PySide2PyQt4Worker(self.view).start()
         else:
             PySide2PyQt4Worker(self.view, edit).run()
+
+
+class OpenFileInDesignerCommand(sublime_plugin.TextCommand):
+    """Open the actual view buffer in Qt Designer if is a valid ui file
+    """
+
+    def run(self, edit):
+        """Run the command
+        """
+
+        command = QtDesignerCommand()
+        command.open_file_in_designer(self.view)
+
+    def is_enabled(self):
+        """Determine if this command is enabled
+        """
+
+        return self.view.file_name().endswith('.ui')
 
 
 # =============================================================================
@@ -206,7 +225,8 @@ class CreateQtProjectThread(threading.Thread):
             project.generate_project()
 
             project.generate_st2_project()
-            project.generate_rope_project()
+            if SUBLIME_TEXT_3 is False:
+                project.generate_rope_project()
 
             subprocess.Popen(
                 [
@@ -460,8 +480,7 @@ class Project(object):
                 file_buffer = fhandler.read().replace(
                     '${APP_NAME}', app_name).replace(
                         '${QT_LIBRARY}', self.lib).replace(
-                            '${PyQT_API_CHECK}', self.pyqt_api_check()
-                        )
+                            '${PyQT_API_CHECK}', self.pyqt_api_check())
 
             with open(path, 'w') as fhandler:
                 fhandler.write(file_buffer)
@@ -584,6 +603,57 @@ class RopeManager(object):
             sublime.status_message(msg.format(self.root, str(error)))
 
 
+class Command(object):
+    """Base class for external commands
+    """
+
+    def __init__(self, command):
+        self.command = command
+        self.proc = None
+
+    def launch(self):
+        """Launch the external process
+        """
+
+        kwargs = {
+            'cwd': os.path.dirname(os.path.abspath(__file__)),
+            'bufsize': -1
+        }
+
+        if sublime.platform() == 'windows':
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            kwargs['startupinfo'] = startupinfo
+
+        sub_args = [self.command] + self.options
+
+        self.proc = subprocess.Popen(sub_args, **kwargs)
+
+
+class QtDesignerCommand(Command):
+    """Qt Designer
+    """
+
+    def __init__(self):
+        self.options = []
+        command = get_settings('sublimepyside_qt_tools_map').get('designer')
+        if command is None:
+            self.is_valid = False
+            sublime.error_message(
+                'Designer application path is not configured'
+            )
+        else:
+            self.is_valid = True
+            super(QtDesignerCommand, self).__init__(command)
+
+    def open_file_in_designer(self, view):
+        """Open the view buffer into Qt Designer
+        """
+
+        self.options.append(view.file_name())
+        self.launch()
+
+
 # =============================================================================
 # Global functions
 # =============================================================================
@@ -594,6 +664,11 @@ def sublime_executable_path():
     platform = sublime.platform()
     error = sublime.set_timeout(
         functools.partial(get_settings, 'osx_st2_path'), 0)
+
+    # in Sublime Text 3 we can just use `sublime.executable_path()
+    if SUBLIME_TEXT_3 is True:
+        return sublime.executable_path()
+
     if platform == 'osx':
         if not error:
             return ('/Applications/Sublime Text 2.app'
@@ -601,21 +676,9 @@ def sublime_executable_path():
         else:
             return error
 
-    # in Sublime Text 3 the process that executes plugins is not sublime_text
-    # is just `plugin_host` so we need just to hardcode it for the moment
-    # until we think in a better way to do it
     if platform == 'linux':
         if os.path.exists('/proc/self/cmdline'):
-            if SUBLIME_TEXT_3 is True:
-                plugin_host = open(
-                    '/proc/self/cmdline').read().split(chr(0))[0]
-                plugin_host = '{}/sublime_text'.format(
-                    '/'.join(plugin_host.split('/')[:-1])
-                )
-
-                return plugin_host
-            else:
-                return open('/proc/self/cmdline').read().split(chr(0))[0]
+            return open('/proc/self/cmdline').read().split(chr(0))[0]
 
     return sys.executable
 

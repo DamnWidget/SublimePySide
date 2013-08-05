@@ -7,7 +7,7 @@
 Base class for converters
 """
 
-sip_api_2 = '''# PyQT4 API 2 SetUp. Comment on remove if you are using Python 3
+sip_api_2 = '''# PyQT4 API 2 SetUp. Comment or remove if you are using Python 3
 import sip
 
 sip.setapi('QString', 2)
@@ -17,7 +17,6 @@ sip.setapi('QTime', 2)
 sip.setapi('QDate', 2)
 sip.setapi('QDateTime', 2)
 sip.setapi('QUrl', 2)
-
 '''
 
 
@@ -34,7 +33,7 @@ class BaseConverter(object):
     def convert(self, st_edit):
         """Try to convert the file"""
 
-        edit = self.view.begin_edit() if st_edit is None else st_edit
+        edit = st_edit if st_edit is not None else self.view.begin_edit()
 
         for key in self.pattern:
             matches = self.view.find_all(key)
@@ -43,4 +42,5 @@ class BaseConverter(object):
             for item in matches:
                 self.view.replace(edit, item, self.pattern[key])
 
-        self.view.end_edit(edit)
+        if st_edit is None:
+            self.view.end_edit(edit)

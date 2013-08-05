@@ -10,5 +10,9 @@
     {
         "caption": "SublimePySide: Convert PySide to PyQt4 syntax",
         "command": "convert_py_side2_py_qt4"
+    },
+    {
+        "caption": "SublimePySide: Open file with Qt Designer",
+        "command": "open_file_in_designer"
     }
 ]
