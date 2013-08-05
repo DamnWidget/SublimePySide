@@ -137,6 +137,17 @@ class NewDialogCommand(sublime_plugin.TextCommand):
         return True
 
 
+class OpenQdbusviewerCommand(sublime_plugin.TextCommand):
+    """Open the QDbusViewer application
+    """
+
+    def run(self, edit):
+        """Run the command
+        """
+
+        QDBusViewerCommand()
+
+
 # =============================================================================
 # Thread working classes
 # =============================================================================
@@ -643,6 +654,9 @@ class Command(object):
         """Launch the external process
         """
 
+        if getattr(self, 'is_valid', True) is False:
+            return
+
         kwargs = {
             'cwd': os.path.dirname(os.path.abspath(__file__)),
             'bufsize': -1
@@ -658,15 +672,32 @@ class Command(object):
         self.proc = subprocess.Popen(sub_args, **kwargs)
 
 
+class QDBusViewerCommand(Command):
+    """QDBusViewer
+    """
+
+    def __init__(self):
+        self.options = []
+
+        command = get_settings('sublimepyside_qt_tools_map').get('qdbusviewer')
+        if command is None:
+            self.is_valid = False
+            sublime.error_message(
+                'QDBusViewer application path is not configured'
+            )
+        else:
+            super(QDBusViewerCommand, self).__init__(command)
+            self.launch()
+
+
 class QtDesignerCommand(Command):
     """Qt Designer
     """
 
-    def __init__(self, view, edit):
+    def __init__(self, view):
         self.view = view
-        self.edit = edit
-
         self.options = []
+
         command = get_settings('sublimepyside_qt_tools_map').get('designer')
         if command is None:
             self.is_valid = False

@@ -27,6 +27,10 @@
                     {
                         "caption": "SublimePySide: Create new Qt Designer file from template",
                         "command": "new_dialog"
+                    },
+                    {
+                        "caption": "SublimePySide: Open QDBusViewer application",
+                        "command": "open_qdbusviewer"
                     }
                 ]
             }
