@@ -67,6 +67,10 @@ PySide features are describe below:
 * Open ui files with Qt Designer if installed (and it's path is configured)
 * Create new UI files for Qt Designer and open it automatically
 
+#### Other Tools
+
+* Open QDBusViewer from Sublime Text
+
 Supported Templates
 --------------------
 
