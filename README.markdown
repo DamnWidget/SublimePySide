@@ -64,7 +64,7 @@ PySide features are describe below:
 
 #### Qt Designer related
 
-* Open ui files with Qt Designer if installed (and itś path configured)
+* Open ui files with Qt Designer if installed (and it's path is configured)
 * Create new UI files for Qt Designer and open it automatically
 
 Supported Templates
