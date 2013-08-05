@@ -20,7 +20,11 @@
         "command": "new_dialog"
     },
     {
-        "caption": "SublimePySide: Open QDBusViewer application",
+        "caption": "SublimePySide: Open QDBusViewer",
         "command": "open_qdbusviewer"
+    },
+    {
+        "caption": "SublimePySide: Open Qt Linguist",
+        "command": "open_linguist"
     }
 ]

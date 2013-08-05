@@ -67,6 +67,11 @@ PySide features are describe below:
 * Open ui files with Qt Designer if installed (and it's path is configured)
 * Create new UI files for Qt Designer and open it automatically
 
+#### Qt Linguist and friends
+
+* Open Qt Linguist from Sublime Text
+* Open TS files that we have already open in Sublime Text with Qt Linguist (it only works with TS or QM files)
+
 #### Other Tools
 
 * Open QDBusViewer from Sublime Text

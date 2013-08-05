@@ -148,6 +148,17 @@ class OpenQdbusviewerCommand(sublime_plugin.TextCommand):
         QDBusViewerCommand()
 
 
+class OpenLinguistCommand(sublime_plugin.TextCommand):
+    """Open the Qt Linguist application
+    """
+
+    def run(self, edit):
+        """Run the command
+        """
+
+        LinguistCommand(self.view).open_linguist()
+
+
 # =============================================================================
 # Thread working classes
 # =============================================================================
@@ -654,9 +665,6 @@ class Command(object):
         """Launch the external process
         """
 
-        if getattr(self, 'is_valid', True) is False:
-            return
-
         kwargs = {
             'cwd': os.path.dirname(os.path.abspath(__file__)),
             'bufsize': -1
@@ -670,6 +678,41 @@ class Command(object):
         sub_args = [self.command] + self.options
 
         self.proc = subprocess.Popen(sub_args, **kwargs)
+
+
+class LinguistCommand(Command):
+    """Linguist
+    """
+
+    def __init__(self, view):
+        self.view = view
+        self.options = []
+
+        command = get_settings('sublimepyside_qt_tools_map').get('linguist')
+        if command is None:
+            self.is_valid = False
+            sublime.error_message(
+                'Qt Linguist application path is not configured'
+            )
+        else:
+            self.is_valid = True
+            super(LinguistCommand, self).__init__(command)
+
+    def open_linguist(self):
+        """Just open Qt Linguist
+        """
+
+        self.launch()
+
+    def open_file_in_linguist(self):
+        """Open the buffer file with linguist
+        """
+
+        if (self.view.file_name().lower().endswith('.ts')
+                or self.view.file_name().lower().endswith('.qm')):
+            self.options.append(self.view.file_name())
+        else:
+            sublime.error_message('Unknown file extension...')
 
 
 class QDBusViewerCommand(Command):
@@ -686,6 +729,7 @@ class QDBusViewerCommand(Command):
                 'QDBusViewer application path is not configured'
             )
         else:
+            self.is_valid = True
             super(QDBusViewerCommand, self).__init__(command)
             self.launch()
 
