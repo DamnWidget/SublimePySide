@@ -14,7 +14,7 @@ Python support is build for PySide and PyQt4 as well. This has been tested on Li
 
 Copyright (C) 2012 - 2013 Oscar Campos <oscar.campos@member.fsf.org>
 
-**WARNING**: SublimeRope features doesn't work in Sublime Text 3. When convert a file from PySide to PyQt4 or viceversa in Sublime Text 3, you should save the file and reopen it again because the cursor is lost (trying to fix it already).
+**WARNING**: SublimeRope features doesn't work in Sublime Text 3.
 
 
 Getting Started
@@ -46,10 +46,14 @@ To convert PyQt4 to PySide syntax you can use the keybindings:
 **NOTES**: Conversion from PyQt4 API 1 QVariant toWhatever methods to PySide is not automatic yet so maybe you should edit your code by hand after conversion. PySide only converts to PyQt4 API 2.
 
 
-**IMPORTANT**: This plugin use SublimeRope if installed to generate Rope projects in an automatic way. Note that this behaviour is only true in Sublime Text 2, in Sublime Text 3 you don't have the need to create SublimeRope projects if you are using SublimePython (the Sublime Text 3 version of SublimeRope)
+**IMPORTANT**: This plugin use SublimeRope if installed to generate Rope projects in an automatic way. Note that this behaviour is only true in Sublime Text 2, in Sublime Text 3 you don't have the need to create SublimeRope projects if you are using [Anaconda](https://github.com/DamnWidget/anaconda)
 
 Features
 ----------
+
+PySide features are describe below:
+
+#### Syntax Helpers
 
 * QML file syntax highligth
 * QMLProject file syntax highlight
@@ -57,7 +61,11 @@ Features
 * PySide and PyQt4 autocompletion via SublimeRope
 * PySide to PyQt4 syntax conversion
 * PyQt4 to PySide syntax conversion
+
+#### Qt Designer related
+
 * Open ui files with Qt Designer if installed (and itś path configured)
+* Create new UI files for Qt Designer and open it automatically
 
 Supported Templates
 --------------------
