@@ -159,6 +159,17 @@ class OpenLinguistCommand(sublime_plugin.TextCommand):
         LinguistCommand(self.view).open_linguist()
 
 
+class GenerateTranslationsCommand(sublime_plugin.TextCommand):
+    """Generate Qt Linguist TS files
+    """
+
+    def run(self, edit):
+        """Run the command
+        """
+
+        PySideLupdateCommand(self.view).generate_translations()
+
+
 # =============================================================================
 # Thread working classes
 # =============================================================================
@@ -713,6 +724,76 @@ class LinguistCommand(Command):
             self.options.append(self.view.file_name())
         else:
             sublime.error_message('Unknown file extension...')
+
+
+class PySideLupdateCommand(Command):
+    """PySide Lupdate
+    """
+
+    def __init__(self, view):
+        self.view = view
+        self.options = []
+
+        command = get_settings('sublimepyside_tools_map').get('lupdate')
+        if command is None:
+            self.is_valid = False
+            sublime.error_message(
+                'PySide Lupdate tool path is not configured'
+            )
+        else:
+            self.is_valid = True
+            super(PySideLupdateCommand, self).__init__(command)
+
+    def generate_translations(self):
+        """Generate TS files using project file or iterating over the directory
+        """
+
+        pro_files = glob(os.path.join(
+            self.view.window().folders()[0], '*.pro')
+        )
+
+        if len(pro_files) == 0:
+            self._generate_from_sources()
+        else:
+            self._generate_from_project_files(pro_files)
+
+    def _generate_from_project_files(self, files):
+        """Generate the TS files using one project file
+        """
+
+        if len(files) > 1:
+            # there are several project files ask the user about
+            if sublime.ok_cancel_dialog(
+                'There are more than one Qt project file in the project '
+                'do you want to use all of them? (If not select one)'
+            ):
+                for f in files:
+                    self._generate_translation_from_file(f, True)
+            else:
+                self.view.window().show_quick_panel(
+                    files, self._generate_translation_from_file
+                )
+
+    def _generate_from_sources(self):
+        """Generate the TS files from python sources
+        """
+
+        for filename in glob(os.path.join(
+            self.view.window().folders()[0], '*.py')
+        ):
+            self._generate_translation_from_file(filename)
+
+    def _generate_translation_from_file(self, filename, project=False):
+        """Closure to feed callbacks
+        """
+
+        self.options = []
+        self.options.append(filename)
+
+        if project is False:
+            self.options += ['-ts', filename.replace('.py', '.ts')]
+
+        self.launch()
 
 
 class QDBusViewerCommand(Command):
