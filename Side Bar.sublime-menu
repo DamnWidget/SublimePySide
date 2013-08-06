@@ -1,0 +1,39 @@
+[
+    {
+        "caption": "PySide",
+        "id": "pyside_commands",
+        "children":
+        [
+            {
+                "caption": "Create Project",
+                "command": "create_qt_project"
+            },
+            {
+                "caption": "Open file with Qt Designer",
+                "command": "open_file_in_designer"
+            },
+            {
+                "caption": "Create new Qt Designer file from template",
+                "command": "new_dialog",
+                "args": {"dirs": []}
+            },
+            {
+                "caption": "Open file with Qt Linguist",
+                "command": "open_in_linguist"
+            },
+            {
+                "caption": "Run lupdate to generate TS files",
+                "command": "generate_translations",
+                "args": {"files": [], "dirs": []}
+            },
+            {
+                "caption": "Convert to PyQt4 Syntax",
+                "command": "convert_py_side2_py_qt4"
+            },
+            {
+                "caption": "Convert to PySide Syntax",
+                "command": "convert_py_qt42_py_side"
+            }
+        ]
+    }
+]

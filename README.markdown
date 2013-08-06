@@ -71,7 +71,7 @@ PySide features are describe below:
 
 * Open Qt Linguist from Sublime Text
 * Open TS files that we have already open in Sublime Text with Qt Linguist (it only works with TS or QM files)
-* Generate project (by Qt project file or by python sources) linguist TS files
+* Generate project (by Qt project file or by python sources) linguist TS files (available as side bar context menu)
 
 #### Other Tools
 

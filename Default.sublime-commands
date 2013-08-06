@@ -28,7 +28,7 @@
         "command": "open_linguist"
     },
     {
-        "caption": "SublimePySide: Run lupdate to generate TS files",
-        "command": "generate_translations"
+        "caption": "SublimePySide: Open file with Qt Linguist",
+        "command": "open_in_linguist"
     }
 ]

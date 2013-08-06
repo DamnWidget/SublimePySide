@@ -75,6 +75,17 @@ class ConvertPyQt42PySideCommand(sublime_plugin.TextCommand):
         else:
             PyQt42PySideWorker(self.view, edit).run()
 
+    def is_enabled(self):
+        """Determine if this command is enabled
+        """
+
+        if 'from PyQt4' in self.view.substr(
+            sublime.Region(0, self.view.size())
+        ):
+            return True
+
+        return False
+
 
 class ConvertPySide2PyQt4Command(sublime_plugin.TextCommand):
     """Converts a PySide buffer to PyQt4 syntax
@@ -92,39 +103,50 @@ class ConvertPySide2PyQt4Command(sublime_plugin.TextCommand):
         else:
             PySide2PyQt4Worker(self.view, edit).run()
 
+    def is_enabled(self):
+        """Determine if this command is enabled
+        """
 
-class OpenFileInDesignerCommand(sublime_plugin.TextCommand):
+        if 'from PySide' in self.view.substr(
+            sublime.Region(0, self.view.size())
+        ):
+            return True
+
+        return False
+
+
+class OpenFileInDesignerCommand(sublime_plugin.WindowCommand):
     """Open the actual view buffer in Qt Designer if is a valid ui file
     """
 
-    def run(self, edit):
+    def run(self):
         """Run the command
         """
 
-        command = QtDesignerCommand(self.view, edit)
+        command = QtDesignerCommand(self.window.active_view())
         command.open_file_in_designer()
 
     def is_enabled(self):
         """Determine if this command is enbaled in determinate conditions
         """
 
-        file_name = self.view.file_name()
+        file_name = self.window.active_view().file_name()
         if file_name is not None:
-            return self.view.file_name().endswith('.ui')
+            return self.window.active_view().file_name().endswith('.ui')
 
         return False
 
 
-class NewDialogCommand(sublime_plugin.TextCommand):
+class NewDialogCommand(sublime_plugin.WindowCommand):
     """Create a new dialog with buttons at bottom for QtDesigner
     """
 
-    def run(self, edit):
+    def run(self, dirs=[]):
         """Run the command
         """
 
-        command = QtDesignerCommand(self.view, edit)
-        command.new_dialog(buttons=True, position='right')
+        command = QtDesignerCommand(self.window.active_view())
+        command.new_dialog(dirs, buttons=True, position='right')
 
     def is_enabled(self):
         """Determine if this command is enbaled in determinate conditions
@@ -137,37 +159,80 @@ class NewDialogCommand(sublime_plugin.TextCommand):
         return True
 
 
-class OpenQdbusviewerCommand(sublime_plugin.TextCommand):
+class OpenQdbusviewerCommand(sublime_plugin.WindowCommand):
     """Open the QDbusViewer application
     """
 
-    def run(self, edit):
+    def run(self):
         """Run the command
         """
 
         QDBusViewerCommand()
 
 
-class OpenLinguistCommand(sublime_plugin.TextCommand):
+class OpenLinguistCommand(sublime_plugin.WindowCommand):
     """Open the Qt Linguist application
     """
 
-    def run(self, edit):
+    def run(self):
         """Run the command
         """
 
-        LinguistCommand(self.view).open_linguist()
+        LinguistCommand().open_linguist()
 
 
-class GenerateTranslationsCommand(sublime_plugin.TextCommand):
+class OpenInLinguistCommand(sublime_plugin.WindowCommand):
+    """Open a TS or QM file with Qt Linguist
+    """
+
+    def run(self):
+        """Run the command
+        """
+
+        LinguistCommand().open_file_in_linguist(self.window.active_view())
+
+    def is_enabled(self):
+        """Determine if this command is enabled or not
+        """
+
+        if (self.window.active_view().file_name().endswith('.ts')
+                or self.window.active_view().file_name().endswith('.qm')):
+            return True
+
+        return False
+
+
+class GenerateTranslationsCommand(sublime_plugin.WindowCommand):
     """Generate Qt Linguist TS files
     """
 
-    def run(self, edit):
+    def run(self, files=[], dirs=[]):
         """Run the command
         """
 
-        PySideLupdateCommand(self.view).generate_translations()
+        if not files and not dirs:
+            sublime.error_message(
+                'You have to call this function from the side bar context menu'
+            )
+            return
+
+        PySideLupdateCommand(self.window).generate_translations(files, dirs)
+
+    def is_enabled(self, files=[], dirs=[]):
+        """Determine if the command is enabled
+        """
+
+        if files:
+            for filename in files:
+                if filename.endswith('.py') or filename.endswith('.pro'):
+                    return True
+
+        for dirname in dirs:
+            for filename in glob('{}/{}'.format(dirname, '*[.py,.pro]')):
+                if filename.endswith('.py') or filename.endswith('.pro'):
+                    return True
+
+        return False
 
 
 # =============================================================================
@@ -695,8 +760,7 @@ class LinguistCommand(Command):
     """Linguist
     """
 
-    def __init__(self, view):
-        self.view = view
+    def __init__(self):
         self.options = []
 
         command = get_settings('sublimepyside_qt_tools_map').get('linguist')
@@ -715,13 +779,14 @@ class LinguistCommand(Command):
 
         self.launch()
 
-    def open_file_in_linguist(self):
+    def open_file_in_linguist(self, view):
         """Open the buffer file with linguist
         """
 
-        if (self.view.file_name().lower().endswith('.ts')
-                or self.view.file_name().lower().endswith('.qm')):
-            self.options.append(self.view.file_name())
+        if (view.file_name().lower().endswith('.ts')
+                or view.file_name().lower().endswith('.qm')):
+            self.options.append(view.file_name())
+            self.launch()
         else:
             sublime.error_message('Unknown file extension...')
 
@@ -730,8 +795,8 @@ class PySideLupdateCommand(Command):
     """PySide Lupdate
     """
 
-    def __init__(self, view):
-        self.view = view
+    def __init__(self, window):
+        self.window = window
         self.options = []
 
         command = get_settings('sublimepyside_tools_map').get('lupdate')
@@ -744,55 +809,44 @@ class PySideLupdateCommand(Command):
             self.is_valid = True
             super(PySideLupdateCommand, self).__init__(command)
 
-    def generate_translations(self):
+    def generate_translations(self, files, dirs):
         """Generate TS files using project file or iterating over the directory
         """
 
-        pro_files = glob(os.path.join(
-            self.view.window().folders()[0], '*.pro')
-        )
+        self.handle_files(files)
+        self.handle_dirs(dirs)
 
-        if len(pro_files) == 0:
-            self._generate_from_sources()
-        else:
-            self._generate_from_project_files(pro_files)
-
-    def _generate_from_project_files(self, files):
-        """Generate the TS files using one project file
+    def handle_files(self, files):
+        """Handle files to generate TS
         """
 
-        if len(files) > 1:
-            # there are several project files ask the user about
-            if sublime.ok_cancel_dialog(
-                'There are more than one Qt project file in the project '
-                'do you want to use all of them? (If not select one)'
-            ):
-                for f in files:
-                    self._generate_translation_from_file(f, True)
-            else:
-                self.view.window().show_quick_panel(
-                    files, self._generate_translation_from_file
-                )
+        for filename in files:
+            if filename.endswith('.py'):
+                self.generate_translation_from_file(filename)
+            elif filename.endswith('.pro'):
+                self.generate_translation_from_project(filename)
 
-    def _generate_from_sources(self):
-        """Generate the TS files from python sources
+    def handle_dirs(self, dirs):
+        """Hadnle dirs to generate TS
         """
 
-        for filename in glob(os.path.join(
-            self.view.window().folders()[0], '*.py')
-        ):
-            self._generate_translation_from_file(filename)
+        for dirname in dirs:
+            self.handle_files(glob('{}/{}'.format(dirname, '*[.py,.pro]')))
 
-    def _generate_translation_from_file(self, filename, project=False):
-        """Closure to feed callbacks
+    def generate_translation_from_file(self, filename):
+        """Just a convenience method
+        """
+
+        self.options = []
+        self.options += [filename, '-ts', filename.replace('.py', '.ts')]
+        self.launch()
+
+    def generate_translation_from_project(self, filename):
+        """Just a convenience method
         """
 
         self.options = []
         self.options.append(filename)
-
-        if project is False:
-            self.options += ['-ts', filename.replace('.py', '.ts')]
-
         self.launch()
 
 
@@ -822,6 +876,7 @@ class QtDesignerCommand(Command):
     def __init__(self, view):
         self.view = view
         self.options = []
+        self.dirs = []
 
         command = get_settings('sublimepyside_qt_tools_map').get('designer')
         if command is None:
@@ -847,10 +902,11 @@ class QtDesignerCommand(Command):
         self.options.append(self.view.file_name())
         self.launch()
 
-    def new_dialog(self, buttons=True, position='right'):
+    def new_dialog(self, dirs, buttons=True, position='right'):
         """Create a new template for QtDesigner and opens it
         """
 
+        self.dirs = dirs
         self.view.window().show_quick_panel(
             self.designer_options['templates_list'], self.template_selected
         )
@@ -876,8 +932,10 @@ class QtDesignerCommand(Command):
             os.path.dirname(__file__), 'data', 'designer', 'templates',
             '{}.ui'.format('_'.join(self.tpl.lower().split(' ')))
         )
-        filename = os.path.join(self.view.window().folders()[0], name + '.ui')
 
+        self.dirs.append(self.view.window().folders()[0])
+
+        filename = os.path.join(self.dirs[0], name + '.ui')
         in_file = open(tpl, 'r')
         out_file = open(filename, 'w')
 
