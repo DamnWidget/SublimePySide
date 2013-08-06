@@ -104,3 +104,9 @@ License:
 
 Have a look at "LICENSE.txt" file for more information.
 
+Donate
+------
+
+[<img src="https://api.flattr.com/button/flattr-badge-large.png" />][0]
+
+[0]: https://flattr.com/submit/auto?user_id=damnwidget&url=https://github.com/DamnWidget/SublimePySide&title=SublimePySide&language=en_US&tags=sublime%20text,programming&category=software
