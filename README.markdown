@@ -14,7 +14,7 @@ Python support is build for PySide and PyQt4 as well. This has been tested on Li
 
 Copyright (C) 2012 - 2013 Oscar Campos <oscar.campos@member.fsf.org>
 
-**WARNING**: SublimeRope features doesn't work in Sublime Text 3.
+**WARNING**: SublimeRope features doesn't work in Sublime Text 3 but you can use [Anaconda](https://github.com/DamnWidget/anaconda) to get full auto completion.
 
 
 Getting Started
@@ -46,7 +46,7 @@ To convert PyQt4 to PySide syntax you can use the keybindings:
 **NOTES**: Conversion from PyQt4 API 1 QVariant toWhatever methods to PySide is not automatic yet so maybe you should edit your code by hand after conversion. PySide only converts to PyQt4 API 2.
 
 
-**IMPORTANT**: This plugin use SublimeRope if installed to generate Rope projects in an automatic way. Note that this behaviour is only true in Sublime Text 2, in Sublime Text 3 you don't have the need to create SublimeRope projects if you are using [Anaconda](https://github.com/DamnWidget/anaconda)
+**IMPORTANT**: This plugin use SublimeRope if installed to generate Rope projects in an automatic way. Note that this behaviour is only true in Sublime Text 2, in Sublime Text 3 you can use [Anaconda](https://github.com/DamnWidget/anaconda) to get full autocompletion.
 
 Features
 ----------
@@ -109,4 +109,4 @@ Donate
 
 [<img src="https://api.flattr.com/button/flattr-badge-large.png" />][0]
 
-[0]: https://flattr.com/submit/auto?user_id=damnwidget&url=https://github.com/DamnWidget/SublimePySide&title=SublimePySide&language=en_US&tags=sublime%20text,programming&category=software
+[0]: http://flattr.com/thing/1765346/
