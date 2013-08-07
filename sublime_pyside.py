@@ -824,10 +824,11 @@ class RCCCommand(Command):
             rcc_options = get_settings('sublimepyside_rcc_options')
             if rcc_options.get('output_file', '') != 'same_rc':
                 self.window.show_input_panel(
-                    'File name (with no extension):',
+                    'Output filename (with no extension):',
+                    filename.replace('.qrc', '_rc'),
                     lambda name: self.compile_resource_file(
                         filename, '{0}.py'.format(name.strip()), rcc_options
-                    )
+                    ), None, None
                 )
             else:
                 self.compile_resource_file(
