@@ -25,6 +25,14 @@
                 "command": "compile_resource"
             },
             {
+                "caption": "Preview UI file",
+                "command": "preview_ui"
+            },
+            {
+                "caption": "Compile UI",
+                "command": "compile_ui"
+            },
+            {
                 "caption": "Convert to PyQt4 Syntax",
                 "command": "convert_py_side2_py_qt4"
             },

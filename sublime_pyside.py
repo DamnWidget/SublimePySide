@@ -239,7 +239,27 @@ class GenerateTranslationsCommand(sublime_plugin.WindowCommand):
         return False
 
 
-class CompileResourceCommand(sublime_plugin.WindowCommand):
+class CompileCommons:
+    """Compile commons methods and parameters
+    """
+
+    def is_enabled(self, files=[]):
+        """Determine if a command is enabled
+        """
+
+        if not files:
+            if (not self.window.active_view() or not
+                    self.window.active_view().file_name().endswith(self.ext)):
+                return False
+        else:
+            for filename in files:
+                if not filename.endswith(self.ext):
+                    return False
+
+        return True
+
+
+class CompileResourceCommand(sublime_plugin.WindowCommand, CompileCommons):
     """Compile Qt Resources
     """
 
@@ -263,16 +283,51 @@ class CompileResourceCommand(sublime_plugin.WindowCommand):
         """Determine if the command is enabled
         """
 
+        self.ext = '.qrc'
+        return CompileCommons.is_enabled(self, files)
+
+
+class CompileUiCommand(sublime_plugin.WindowCommand, CompileCommons):
+    """Compile Qt UI files
+    """
+
+    def run(self, files=[]):
+        """Run the command
+        """
+
         if not files:
-            if (not self.window.active_view() or not
-                    self.window.active_view().file_name().endswith('.qrc')):
-                return False
+            PyUicCommand(self.window).compile()
         else:
             for filename in files:
-                if not filename.endswith('.qrc'):
-                    return False
+                PyUicCommand(self.window).compile(filename)
 
-        return True
+    def is_enabled(self, files=[]):
+        """Determine if the command is enabled
+        """
+
+        self.ext = '.ui'
+        return CompileCommons.is_enabled(self, files)
+
+
+class PreviewUiCommand(sublime_plugin.WindowCommand):
+    """Preview an UI file
+    """
+
+    def run(self):
+        """Run the command
+        """
+
+        PyUicCommand(self.window).preview()
+
+    def is_enabled(self):
+        """Determine if the command is enabled
+        """
+
+        if self.window.active_view() is not None:
+            if self.window.active_view().file_name().endswith('.ui'):
+                return True
+
+        return False
 
 
 # =============================================================================
@@ -793,6 +848,45 @@ class Command(object):
 
         sub_args = [self.command] + self.options
         self.proc = subprocess.Popen(sub_args, **kwargs)
+
+
+class PyUicCommand(Command):
+    """PySide-uic
+    """
+
+    def __init__(self, window):
+        self.window = window
+        self.options = []
+
+        command = get_settings('sublimepyside_tools_map').get('uic')
+        if command is None:
+            self.is_valid = False
+            sublime.error_message(
+                'PySide-uic application path is not configured'
+            )
+        else:
+            self.is_valid = True
+            super(PyUicCommand, self).__init__(command)
+
+    def preview(self, filename=None):
+        """Show a preview of the given filename
+        """
+
+        if filename is None:
+            filename = self.window.active_view().file_name()
+
+        self.options += ['-p', filename]
+        self.launch()
+
+    def compile(self, filename=None):
+        """Compile a UI file
+        """
+
+        if filename is None:
+            filename = self.window.active_view().file_name()
+
+        self.options += ['-o', filename.replace('.ui', '_ui.py'), filename]
+        self.launch()
 
 
 class RCCCommand(Command):
