@@ -27,6 +27,11 @@
                 "args": {"files": [], "dirs": []}
             },
             {
+                "caption": "Compile resource file",
+                "command": "compile_resource",
+                "args": {"files": []}
+            },
+            {
                 "caption": "Convert to PyQt4 Syntax",
                 "command": "convert_py_side2_py_qt4"
             },

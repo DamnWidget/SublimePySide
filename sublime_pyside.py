@@ -123,12 +123,15 @@ class OpenFileInDesignerCommand(sublime_plugin.WindowCommand):
         """Run the command
         """
 
-        command = QtDesignerCommand(self.window.active_view())
+        command = QtDesignerCommand(self.window)
         command.open_file_in_designer()
 
     def is_enabled(self):
         """Determine if this command is enbaled in determinate conditions
         """
+
+        if self.window.active_view() is None:
+            return False
 
         file_name = self.window.active_view().file_name()
         if file_name is not None:
@@ -145,7 +148,7 @@ class NewDialogCommand(sublime_plugin.WindowCommand):
         """Run the command
         """
 
-        command = QtDesignerCommand(self.window.active_view())
+        command = QtDesignerCommand(self.window)
         command.new_dialog(dirs, buttons=True, position='right')
 
     def is_enabled(self):
@@ -195,8 +198,9 @@ class OpenInLinguistCommand(sublime_plugin.WindowCommand):
         """Determine if this command is enabled or not
         """
 
-        if (self.window.active_view().file_name().endswith('.ts')
-                or self.window.active_view().file_name().endswith('.qm')):
+        if (self.window.active_view() is not None and (
+                self.window.active_view().file_name().endswith('.ts')
+                or self.window.active_view().file_name().endswith('.qm'))):
             return True
 
         return False
@@ -233,6 +237,42 @@ class GenerateTranslationsCommand(sublime_plugin.WindowCommand):
                     return True
 
         return False
+
+
+class CompileResourceCommand(sublime_plugin.WindowCommand):
+    """Compile Qt Resources
+    """
+
+    def run(self, files=[]):
+        """Run the command
+        """
+
+        if not files:
+            if (not self.window.active_view() or not
+                    self.window.active_view().file_name().endswith('.qrc')):
+                sublime.error_message(
+                    'This command will process QRC files only.'
+                )
+            else:
+                RCCCommand(self.window).compile()
+        else:
+            for filename in files:
+                RCCCommand(self.window).compile(filename)
+
+    def is_enabled(self, files=[]):
+        """Determine if the command is enabled
+        """
+
+        if not files:
+            if (not self.window.active_view() or not
+                    self.window.active_view().file_name().endswith('.qrc')):
+                return False
+        else:
+            for filename in files:
+                if not filename.endswith('.qrc'):
+                    return False
+
+        return True
 
 
 # =============================================================================
@@ -752,8 +792,72 @@ class Command(object):
             kwargs['startupinfo'] = startupinfo
 
         sub_args = [self.command] + self.options
-
         self.proc = subprocess.Popen(sub_args, **kwargs)
+
+
+class RCCCommand(Command):
+    """PySide-rcc
+    """
+
+    def __init__(self, window):
+        self.window = window
+        self.options = []
+
+        command = get_settings('sublimepyside_tools_map').get('rcc')
+        if command is None:
+            self.is_valid = False
+            sublime.error_message(
+                'PySide-rcc application path is not configured'
+            )
+        else:
+            self.is_valid = True
+            super(RCCCommand, self).__init__(command)
+
+    def compile(self, filename=None):
+        """Compile a file
+        """
+
+        if filename is None:
+            filename = self.window.active_view().file_name()
+
+        if filename.lower().endswith('.qrc'):
+            rcc_options = get_settings('sublimepyside_rcc_options')
+            if rcc_options.get('output_file', '') != 'same_rc':
+                self.window.show_input_panel(
+                    'File name (with no extension):',
+                    lambda name: self.compile_resource_file(
+                        filename, '{0}.py'.format(name.strip()), rcc_options
+                    )
+                )
+            else:
+                self.compile_resource_file(
+                    filename, filename.replace('.qrc', '_rc.py'), rcc_options
+                )
+        else:
+            sublime.error_message('Unknown file extension')
+
+    def compile_resource_file(self, input_file, filename, rcc_options):
+        """Process a QRC file using PySide-rcc
+        """
+
+        self.options += ['-o', filename]
+
+        root_path = rcc_options.get('root_path', '')
+        no_compress = rcc_options.get('no_compress', False)
+        compression_level = rcc_options.get('compression_level', -1)
+
+        if compression_level != -1 and not no_compress:
+            if compression_level >= 0 and compression_level <= 9:
+                self.options += ['-compress', str(compression_level)]
+
+        if no_compress:
+            self.options.append('-no-compress')
+
+        if root_path != '' and type(root_path) is str:
+            self.options += ['-root', root_path]
+
+        self.options.append(input_file)
+        self.launch()
 
 
 class LinguistCommand(Command):
@@ -873,8 +977,8 @@ class QtDesignerCommand(Command):
     """Qt Designer
     """
 
-    def __init__(self, view):
-        self.view = view
+    def __init__(self, window):
+        self.window = window
         self.options = []
         self.dirs = []
 
@@ -899,15 +1003,18 @@ class QtDesignerCommand(Command):
         """Open the view buffer into Qt Designer
         """
 
-        self.options.append(self.view.file_name())
-        self.launch()
+        try:
+            self.options.append(self.window.active_view().file_name())
+            self.launch()
+        except AttributeError:
+            sublime.error_message('There is no active view!')
 
     def new_dialog(self, dirs, buttons=True, position='right'):
         """Create a new template for QtDesigner and opens it
         """
 
         self.dirs = dirs
-        self.view.window().show_quick_panel(
+        self.window.show_quick_panel(
             self.designer_options['templates_list'], self.template_selected
         )
 
@@ -919,7 +1026,7 @@ class QtDesignerCommand(Command):
             return
 
         self.tpl = self.designer_options['templates_list'][picked]
-        self.view.window().show_input_panel(
+        self.window.show_input_panel(
             'UI name (don\'t add extension):',
             self.tpl, self._new_designer_template, None, None
         )
@@ -933,7 +1040,7 @@ class QtDesignerCommand(Command):
             '{}.ui'.format('_'.join(self.tpl.lower().split(' ')))
         )
 
-        self.dirs.append(self.view.window().folders()[0])
+        self.dirs.append(self.window.folders()[0])
 
         filename = os.path.join(self.dirs[0], name + '.ui')
         in_file = open(tpl, 'r')

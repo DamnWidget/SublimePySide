@@ -41,5 +41,36 @@
         If is set to true, SublimePySide should ask about which libraary to use
         PySide or PyQt4
     */
-    "sublimepyside_library_ask": true
+    "sublimepyside_library_ask": true,
+
+    /*
+        Options for RCC command
+    */
+    "sublimepyside_rcc_options": {
+        /*
+            if output_file is set as same_rc, SublimePySide will automatically
+            save the output to a file called <origin_qrc_file>_rc.py it will
+            ask you for a name otherwise
+        */
+        "output_file": "same_rc",
+
+        /*
+            compression_level could be a valid value between 0 and 9, de default
+            is just -1 which specifies zlib's default compression
+
+            for more information look at: http://qt-project.org/doc/qt-4.8/qbytearray.html#qCompress
+        */
+        "compression_level": -1,
+
+        /*
+            when no_compress is set as true, rcc doesn't compress files at all
+        */
+        "no_compress": false,
+
+        /*
+            when root_path is set, all the resources paths are prefixed with it
+        */
+        "root_path": ""
+
+    }
 }

@@ -21,6 +21,10 @@
                 "command": "open_in_linguist"
             },
             {
+                "caption": "Compile resource file",
+                "command": "compile_resource"
+            },
+            {
                 "caption": "Convert to PyQt4 Syntax",
                 "command": "convert_py_side2_py_qt4"
             },
