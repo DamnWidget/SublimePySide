@@ -75,6 +75,7 @@ PySide features are describe below:
 
 #### Other Tools
 
+* Compile resource file with pyside-rcc (available in context and side bar menus)
 * Open QDBusViewer from Sublime Text
 
 Supported Templates
