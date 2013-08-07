@@ -66,6 +66,8 @@ PySide features are describe below:
 
 * Open ui files with Qt Designer if installed (and it's path is configured)
 * Create new UI files for Qt Designer and open it automatically
+* Compile UI (available as side bar and context menus)
+* Preview UI (available as context menu)
 
 #### Qt Linguist and friends
 
