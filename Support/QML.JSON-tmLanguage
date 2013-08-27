@@ -2,7 +2,6 @@
   "scopeName": "source.qml",
   "fileTypes": ["qml", "qmlproject"],
   "patterns": [
-    { "include": "#imports" },
     { "name": "comment.block.documentation.qml",
       "begin": "/\\*\\*(?!/)",
       "captures": {
@@ -10,12 +9,82 @@
       },
       "end": "\\*/"
     },
-    {  "name": "meta.class.qml",
-       "match": "([a-zA-Z_?.$][\\w?.$]*)\\s*(\\{)\\s*",
-       "captures": {
-          "1": { "name": "support.class.qml" }
-       }
+    
+    {
+      "name": "meta.signal.qml",
+      "begin": "(signal)\\s+(\\w+)\\s*",
+      "beginCaptures": {
+        "1": {"name": "keyword.other.qml"},
+        "2": {"name": "support.function.qml"}
+      },
+      "patterns": [
+        {
+          "name": "meta.signal.parameters.qml",
+          "match": "(\\w+)\\s+(\\w+)",
+          "captures": {
+               "1": { "name": "storage.type.qml" },
+               "2": { "name": "variable.parameter.qml" }
+           }
+        }
+      ],
+      "end": "$|;|\\n"
     },
+
+    {
+      "name": "meta.property.qml",
+      "begin": "(?:(default|readonly)\\s+)?(property)\\s+(?:(alias)|(\\w+))\\s+(\\w+)\\s*:?",
+      "beginCaptures": {
+        "1": {"name": "keyword.other.qml"},
+        "2": {"name": "keyword.other.qml"},
+        "3": {"name": "keyword.other.qml"},
+        "4": {"name": "storage.type.qml"},
+        "5": {"name": "entity.other.attribute-name.qml"}
+      },
+      "patterns": [
+        { "include": "source.js" },
+        {"include": "#funccall"},
+        {"include": "#rvaluevar"},
+        {"include": "#rvaluevarattr"}
+      ],
+      "end": ";|$"
+    },
+
+    {
+      "name": "meta.id.qml",
+      "match": "(id):\\s*(\\w+)",
+      "captures": {
+        "1": {"name": "keyword.other.qml"},
+        "2": {"name": "storage.modifier.qml"}
+      }
+    },
+
+    {
+      "name": "meta.class.attribute.qml",
+      "begin": "(?:([A-Z]\\w*)(?:(.on[A-Z]\\w*)|(.\\w+)*)|(on[A-Z]\\w*)|(\\w+(?:\\.\\w+)*))\\s*(?:(?::\\s*\\{?)|(?:\\{))",
+      "beginCaptures": {
+        "1": {"name": "support.class.qml"},
+        "2": {"name": "support.function.qml"},
+        "3": {"name": "entity.other.attribute-name.qml"},
+        "4": {"name": "support.function.qml"},
+        "5": {"name": "entity.other.attribute-name.qml"}
+      },
+      "patterns": [
+        {"include": "source.qml"},
+        {"include": "#funccall"},
+        {"include": "#rvaluevar"},
+        {"include": "#rvaluevarattr"}
+      ],
+      "end": "\\}|;|$"
+    },
+
+    {
+      "name": "meta.class.qml",
+      "match": "([A-Z_?.$][\\w?.$]*)\\s*(\\{)\\s*",
+      "captures": {
+        "1": { "name": "support.class.qml" }
+      }
+    },
+
     { "name": "meta.import.qml",
       "begin": "\\b(import)\\s+",
       "beginCaptures": {
@@ -26,7 +95,33 @@
       ],
       "end": "(?<=[\\n;])"
     },
-    { "include": "source.js" }
+
+    {"include": "source.js" },
+    {"include": "#funccall" },
+    {"include": "#rvaluevar"},
+    {"include": "#rvaluevarattr"}
   ],
+  "repository": {
+    "funccall": {
+        "name": "support.function.qml",
+        "match": "\\.?([_\\w]+)\\("
+    },
+    "rvaluevar": {
+        "name": "meta.rvalue.qml",
+        "match": "(?<!\\.)\\b(?:([a-z][_\\w]*)|([A-Z][_\\w]*))",
+        "captures": {
+            "1": {"name": "variable.parameter"},
+            "2": {"name": "support.class.qml"}
+        }
+    },
+    "rvaluevarattr": {
+        "name": "meta.rvalue.qml",
+        "match": "(?<=\\.)(?:([a-z][_\\w]*)|([A-Z][_\\w]*))",
+        "captures": {
+            "1": {"name": "entity.other.attribute-name.qml"},
+            "2": {"name": "support.constant.qml"}
+        }
+    }
+  },
   "uuid": "13a281e0-0507-45b4-bb6c-a57177630f10"
 }

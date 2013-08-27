@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[
+Component.onCompleted: ${1}
+]]></content>
+    <tabTrigger>component</tabTrigger>
+    <scope>source.qml</scope>
+    <description>Component.onCompleted{}</description>
+</snippet>

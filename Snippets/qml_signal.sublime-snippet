@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[
+signal ${1:name}(${2})
+]]></content>
+    <tabTrigger>signal</tabTrigger>
+    <scope>source.qml</scope>
+    <description>QML signal</description>
+</snippet>

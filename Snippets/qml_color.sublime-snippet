@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[
+color: "#${1}"
+]]></content>
+    <tabTrigger>color</tabTrigger>
+    <scope>source.qml</scope>
+    <description>#...</description>
+</snippet>

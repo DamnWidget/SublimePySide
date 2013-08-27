@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[
+default property ${1:var} ${2:name}
+]]></content>
+    <tabTrigger>default property</tabTrigger>
+    <scope>source.qml</scope>
+    <description>QML default property</description>
+</snippet>

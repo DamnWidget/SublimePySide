@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[
+anchors.margins: ${1:0}
+]]></content>
+    <tabTrigger>anchors.margins</tabTrigger>
+    <scope>source.qml</scope>
+    <description>margins</description>
+</snippet>

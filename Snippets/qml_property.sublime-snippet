@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[
+property ${1:var} ${2:name}
+]]></content>
+    <tabTrigger>property</tabTrigger>
+    <scope>source.qml</scope>
+    <description>QML property</description>
+</snippet>

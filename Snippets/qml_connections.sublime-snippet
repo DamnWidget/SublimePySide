@@ -1,0 +1,11 @@
+<snippet>
+    <content><![CDATA[
+Connections {
+    target: ${1}
+    on${2}: ${3}
+}
+]]></content>
+    <tabTrigger>connections</tabTrigger>
+    <scope>source.qml</scope>
+    <description>Connections{}</description>
+</snippet>
