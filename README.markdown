@@ -57,6 +57,7 @@ PySide features are describe below:
 
 * QML file syntax highligth
 * QMLProject file syntax highlight
+* QML snippets
 * PySide and PyQt4 project creation
 * PySide and PyQt4 autocompletion via SublimeRope
 * PySide to PyQt4 syntax conversion
