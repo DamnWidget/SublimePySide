@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[
+anchors.centerIn: ${1:parent}
+]]></content>
+    <tabTrigger>anchors.centerIn</tabTrigger>
+    <scope>source.qml</scope>
+    <description>centerIn</description>
+</snippet>

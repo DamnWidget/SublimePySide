@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[
+Layout.fillHeight: ${1:true}
+]]></content>
+    <tabTrigger>layout.fillHeight</tabTrigger>
+    <scope>source.qml</scope>
+    <description>height</description>
+</snippet>

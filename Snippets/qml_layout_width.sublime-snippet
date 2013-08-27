@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[
+Layout.fillWidth: ${1:true}
+]]></content>
+    <tabTrigger>layout.fillWidth</tabTrigger>
+    <scope>source.qml</scope>
+    <description>width</description>
+</snippet>

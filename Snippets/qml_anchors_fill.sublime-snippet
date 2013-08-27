@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[
+anchors.fill: ${1:parent}
+]]></content>
+    <tabTrigger>anchors.fill</tabTrigger>
+    <scope>source.qml</scope>
+    <description>fill</description>
+</snippet>

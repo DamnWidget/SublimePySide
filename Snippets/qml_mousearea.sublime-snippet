@@ -1,0 +1,16 @@
+<snippet>
+    <content><![CDATA[
+MouseArea {
+    anchors.fill: parent
+    cursorShape: Qt.PointingHandCursor
+    hoverEnabled: false
+    onEntered: {}
+    onExited: {}
+    onWheel: {}
+    onClicked: ${1}
+}
+]]></content>
+    <tabTrigger>mouse</tabTrigger>
+    <scope>source.qml</scope>
+    <description>MouseArea{}</description>
+</snippet>

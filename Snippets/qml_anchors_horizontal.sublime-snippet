@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[
+anchors.horizontalCenter: ${1:parent}.horizontalCenter
+]]></content>
+    <tabTrigger>anchors.horizontalCenter</tabTrigger>
+    <scope>source.qml</scope>
+    <description>horizontal</description>
+</snippet>

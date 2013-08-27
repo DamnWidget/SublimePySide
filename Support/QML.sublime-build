@@ -1,0 +1,10 @@
+{
+    "cmd": ["qmlscene", "$file"],
+    "selector": "source.qml",
+    "windows": {
+        "cmd": ["qmlscene.exe", "$file"],
+        "env": {"PATH": "D:\\work\\cpp\\libs\\qt-5.1.0\\5.1.0\\msvc2010\\bin"},
+        "encoding": "cp866",
+        "shell": "true"
+    }
+}

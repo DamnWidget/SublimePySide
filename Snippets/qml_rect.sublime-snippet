@@ -1,0 +1,12 @@
+<snippet>
+    <content><![CDATA[
+Rectangle {
+    width: ${1:10}
+    height: ${2:10}
+    color: "${3:transparent}"
+}
+]]></content>
+    <tabTrigger>rectangle</tabTrigger>
+    <scope>source.qml</scope>
+    <description>Rectangle{}</description>
+</snippet>

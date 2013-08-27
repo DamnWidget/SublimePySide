@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[
+property alias ${1:name}: ${2:val}
+]]></content>
+    <tabTrigger>alias</tabTrigger>
+    <scope>source.qml</scope>
+    <description>QML property alias</description>
+</snippet>

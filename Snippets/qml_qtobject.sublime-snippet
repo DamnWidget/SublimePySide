@@ -1,0 +1,10 @@
+<snippet>
+    <content><![CDATA[
+QtObject {
+    id: ${1:m}    
+}
+]]></content>
+    <tabTrigger>obj</tabTrigger>
+    <scope>source.qml</scope>
+    <description>QtObject{}</description>
+</snippet>

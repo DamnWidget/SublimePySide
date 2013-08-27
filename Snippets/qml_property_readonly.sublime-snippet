@@ -1,0 +1,8 @@
+<snippet>
+    <content><![CDATA[
+readonly property ${1:var} ${2:name}: ${3}
+]]></content>
+    <tabTrigger>readonly property</tabTrigger>
+    <scope>source.qml</scope>
+    <description>QML readonly property</description>
+</snippet>
