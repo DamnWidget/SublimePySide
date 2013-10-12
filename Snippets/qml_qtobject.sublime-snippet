@@ -1,7 +1,7 @@
 <snippet>
     <content><![CDATA[
 QtObject {
-    id: ${1:m}    
+    id: ${1:m}
 }
 ]]></content>
     <tabTrigger>obj</tabTrigger>

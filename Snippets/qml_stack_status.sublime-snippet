@@ -1,6 +1,6 @@
 <snippet>
     <content><![CDATA[
-Stack.onStatusChanged {
+Stack.onStatusChanged: {
     if (Stack.status == Stack.Active)
         ${1:;}
     else if (Stack.status == Stack.Inactive)
