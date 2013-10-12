@@ -13,24 +13,118 @@
 	<array>
 		<dict>
 			<key>begin</key>
-			<string>/\*\*(?!/)</string>
-			<key>captures</key>
-			<dict>
-				<key>0</key>
-				<dict>
-					<key>name</key>
-					<string>punctuation.definition.comment.qml</string>
-				</dict>
-			</dict>
+			<string>/\*(?!/)</string>
+			<key>comment</key>
+			<string>Block comment.</string>
 			<key>end</key>
 			<string>\*/</string>
 			<key>name</key>
 			<string>comment.block.documentation.qml</string>
 		</dict>
 		<dict>
+			<key>comment</key>
+			<string>Line comment.</string>
+			<key>match</key>
+			<string>//.*$</string>
+			<key>name</key>
+			<string>comment.line.double-slash.qml</string>
+		</dict>
+		<dict>
 			<key>begin</key>
-			<string>(signal)\s+(\w+)\s*</string>
+			<string>\b(import)\s+</string>
 			<key>beginCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.other.import.qml</string>
+				</dict>
+			</dict>
+			<key>comment</key>
+			<string>import statement.</string>
+			<key>end</key>
+			<string>$</string>
+			<key>name</key>
+			<string>meta.import.qml</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.class.qml</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>constant.numeric.qml</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>keyword.other.import.qml</string>
+						</dict>
+						<key>4</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.class.qml</string>
+						</dict>
+					</dict>
+					<key>comment</key>
+					<string>import Namespace VersionMajor.VersionMinor [as SingletonTypeIdentifier]</string>
+					<key>match</key>
+					<string>([\w\d\.]+)\s+(\d+\.\d+)(?:\s+(as)\s+([A-Z][\w\d]*))?</string>
+					<key>name</key>
+					<string>meta.import.namespace.qml</string>
+				</dict>
+				<dict>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>string.quoted.double.qml</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>keyword.other.import.qml</string>
+						</dict>
+						<key>3</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.class.qml</string>
+						</dict>
+					</dict>
+					<key>comment</key>
+					<string>import &lt;string&gt; [as Script]</string>
+					<key>match</key>
+					<string>(\"[^\"]+\")(?:\s+(as)\s+([A-Z][\w\d]*))?</string>
+					<key>name</key>
+					<string>meta.import.dirjs.qml</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>Capitalized word (class or enum).</string>
+			<key>match</key>
+			<string>\b[A-Z]\w*\b</string>
+			<key>name</key>
+			<string>support.class.qml</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>onSomething - handler.</string>
+			<key>match</key>
+			<string>(((^|\{)\s*)|\b)on[A-Z]\w*\b</string>
+			<key>name</key>
+			<string>support.class.qml</string>
+		</dict>
+		<dict>
+			<key>captures</key>
 			<dict>
 				<key>1</key>
 				<dict>
@@ -40,40 +134,18 @@
 				<key>2</key>
 				<dict>
 					<key>name</key>
-					<string>support.function.qml</string>
+					<string>storage.modifier.qml</string>
 				</dict>
 			</dict>
-			<key>end</key>
-			<string>$|;|\n</string>
+			<key>comment</key>
+			<string>id: &lt;something&gt;</string>
+			<key>match</key>
+			<string>(?:^|\{)\s*(id)\s*\:\s*([^;\s]+)\b</string>
 			<key>name</key>
-			<string>meta.signal.qml</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>captures</key>
-					<dict>
-						<key>1</key>
-						<dict>
-							<key>name</key>
-							<string>storage.type.qml</string>
-						</dict>
-						<key>2</key>
-						<dict>
-							<key>name</key>
-							<string>variable.parameter.qml</string>
-						</dict>
-					</dict>
-					<key>match</key>
-					<string>(\w+)\s+(\w+)</string>
-					<key>name</key>
-					<string>meta.signal.parameters.qml</string>
-				</dict>
-			</array>
+			<string>meta.id.qml</string>
 		</dict>
 		<dict>
-			<key>begin</key>
-			<string>(?:(default|readonly)\s+)?(property)\s+(?:(alias)|(\w+))\s+(\w+)\s*:?</string>
-			<key>beginCaptures</key>
+			<key>captures</key>
 			<dict>
 				<key>1</key>
 				<dict>
@@ -101,32 +173,17 @@
 					<string>entity.other.attribute-name.qml</string>
 				</dict>
 			</dict>
-			<key>end</key>
-			<string>;|$</string>
+			<key>comment</key>
+			<string>property definition.</string>
+			<key>match</key>
+			<string>^\s*(?:(default|readonly)\s+)?(property)\s+(?:(alias)|([\w\&lt;\&gt;]+))\s+(\w+)</string>
 			<key>name</key>
-			<string>meta.property.qml</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>include</key>
-					<string>source.js</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#funccall</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#rvaluevar</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#rvaluevarattr</string>
-				</dict>
-			</array>
+			<string>meta.propertydef.qml</string>
 		</dict>
 		<dict>
-			<key>captures</key>
+			<key>begin</key>
+			<string>\b(signal)\s+(\w+)\s*</string>
+			<key>beginCaptures</key>
 			<dict>
 				<key>1</key>
 				<dict>
@@ -136,66 +193,35 @@
 				<key>2</key>
 				<dict>
 					<key>name</key>
-					<string>storage.modifier.qml</string>
-				</dict>
-			</dict>
-			<key>match</key>
-			<string>(id):\s*(\w+)</string>
-			<key>name</key>
-			<string>meta.id.qml</string>
-		</dict>
-		<dict>
-			<key>begin</key>
-			<string>(?:([A-Z]\w*)(?:(.on[A-Z]\w*)|(.\w+)*)|(on[A-Z]\w*)|(\w+(?:\.\w+)*))\s*(?:(?::\s*\{?)|(?:\{))</string>
-			<key>beginCaptures</key>
-			<dict>
-				<key>1</key>
-				<dict>
-					<key>name</key>
-					<string>support.class.qml</string>
-				</dict>
-				<key>2</key>
-				<dict>
-					<key>name</key>
 					<string>support.function.qml</string>
 				</dict>
-				<key>3</key>
-				<dict>
-					<key>name</key>
-					<string>entity.other.attribute-name.qml</string>
-				</dict>
-				<key>4</key>
-				<dict>
-					<key>name</key>
-					<string>support.function.qml</string>
-				</dict>
-				<key>5</key>
-				<dict>
-					<key>name</key>
-					<string>entity.other.attribute-name.qml</string>
-				</dict>
 			</dict>
+			<key>comment</key>
+			<string>signal &lt;signalName&gt;[([&lt;type&gt; &lt;parameter&gt;[, ...]])]</string>
 			<key>end</key>
-			<string>\}|;|$</string>
+			<string>;|(?=/)|$</string>
 			<key>name</key>
-			<string>meta.class.attribute.qml</string>
+			<string>meta.signal.qml</string>
 			<key>patterns</key>
 			<array>
 				<dict>
-					<key>include</key>
-					<string>source.qml</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#funccall</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#rvaluevar</string>
-				</dict>
-				<dict>
-					<key>include</key>
-					<string>#rvaluevarattr</string>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>storage.type.qml</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>variable.parameter.qml</string>
+						</dict>
+					</dict>
+					<key>match</key>
+					<string>(\w+)\s+(\w+)</string>
+					<key>name</key>
+					<string>meta.signal.parameters.qml</string>
 				</dict>
 			</array>
 		</dict>
@@ -205,104 +231,84 @@
 				<key>1</key>
 				<dict>
 					<key>name</key>
-					<string>support.class.qml</string>
+					<string>constant.language.qml</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>storage.type.qml</string>
+				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.control.qml</string>
 				</dict>
 			</dict>
+			<key>comment</key>
+			<string>js keywords.</string>
 			<key>match</key>
-			<string>([A-Z_?.$][\w?.$]*)\s*(\{)\s*</string>
+			<string>(?:\b|\s+)(?:(true|false|null|undefined)|(var|void)|(on|as|enum|connect|break|case|catch|continue|debugger|default|delete|do|else|finally|for|if|in|instanceof|new|return|switch|this|throw|try|typeof|while|with))\b</string>
 			<key>name</key>
-			<string>meta.class.qml</string>
+			<string>meta.keyword.qml</string>
 		</dict>
 		<dict>
-			<key>begin</key>
-			<string>\b(import)\s+</string>
-			<key>beginCaptures</key>
+			<key>captures</key>
 			<dict>
 				<key>1</key>
 				<dict>
 					<key>name</key>
-					<string>keyword.other.import.qml</string>
+					<string>storage.type.qml</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.function.untitled</string>
 				</dict>
 			</dict>
-			<key>end</key>
-			<string>(?&lt;=[\n;])</string>
+			<key>comment</key>
+			<string>function definition.</string>
+			<key>match</key>
+			<string>\b(function)\s+([\w_]+)\s*(?=\()</string>
 			<key>name</key>
-			<string>meta.import.qml</string>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>include</key>
-					<string>source.scala</string>
-				</dict>
-			</array>
+			<string>meta.function.qml</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>function call.</string>
+			<key>match</key>
+			<string>\b[\w_]+\s*(?=\()</string>
+			<key>name</key>
+			<string>support.function.qml</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>property  (property: &lt;something&gt;).</string>
+			<key>match</key>
+			<string>(?:^|\{|;)\s*[a-z][\w\.]*\s*(?=\:)</string>
+			<key>name</key>
+			<string>entity.other.attribute-name.qml</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>property of the variable (name.property).</string>
+			<key>match</key>
+			<string>(?&lt;=\.)\b\w*</string>
+			<key>name</key>
+			<string>entity.other.attribute-name.qml</string>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>All non colored words are assumed to be variables.</string>
+			<key>match</key>
+			<string>\b([a-z_]\w*)\b</string>
+			<key>name</key>
+			<string>variable.parameter</string>
 		</dict>
 		<dict>
 			<key>include</key>
 			<string>source.js</string>
 		</dict>
-		<dict>
-			<key>include</key>
-			<string>#funccall</string>
-		</dict>
-		<dict>
-			<key>include</key>
-			<string>#rvaluevar</string>
-		</dict>
-		<dict>
-			<key>include</key>
-			<string>#rvaluevarattr</string>
-		</dict>
 	</array>
-	<key>repository</key>
-	<dict>
-		<key>funccall</key>
-		<dict>
-			<key>match</key>
-			<string>\.?([_\w]+)\(</string>
-			<key>name</key>
-			<string>support.function.qml</string>
-		</dict>
-		<key>rvaluevar</key>
-		<dict>
-			<key>captures</key>
-			<dict>
-				<key>1</key>
-				<dict>
-					<key>name</key>
-					<string>variable.parameter</string>
-				</dict>
-				<key>2</key>
-				<dict>
-					<key>name</key>
-					<string>support.class.qml</string>
-				</dict>
-			</dict>
-			<key>match</key>
-			<string>(?&lt;!\.)\b(?:([a-z][_\w]*)|([A-Z][_\w]*))</string>
-			<key>name</key>
-			<string>meta.rvalue.qml</string>
-		</dict>
-		<key>rvaluevarattr</key>
-		<dict>
-			<key>captures</key>
-			<dict>
-				<key>1</key>
-				<dict>
-					<key>name</key>
-					<string>entity.other.attribute-name.qml</string>
-				</dict>
-				<key>2</key>
-				<dict>
-					<key>name</key>
-					<string>support.constant.qml</string>
-				</dict>
-			</dict>
-			<key>match</key>
-			<string>(?&lt;=\.)(?:([a-z][_\w]*)|([A-Z][_\w]*))</string>
-			<key>name</key>
-			<string>meta.rvalue.qml</string>
-		</dict>
-	</dict>
 	<key>scopeName</key>
 	<string>source.qml</string>
 	<key>uuid</key>
