@@ -1,4 +1,8 @@
 {
     "cmd": ["qmlscene", "$file"],
-    "selector": "source.qml"
+    "selector": "source.qml",
+    "file_regex": "^file:\/\/(.+):([0-9]+):() (.*)$",
+    "windows": {
+        "file_regex": "^file:\/\/\/(.+):([0-9]+):() (.*)$"
+    }
 }
